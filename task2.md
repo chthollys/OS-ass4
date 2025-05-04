@@ -1,5 +1,3 @@
-## Name : Jason Januardy
-## NIM  : 1313623035
 # Task 2: Dependency Injection
 
 Source | Libary | Function utilized | Time Used

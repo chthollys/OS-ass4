@@ -1,5 +1,3 @@
-## Name : Jason Januardy
-## NIM  : 1313623035
 ## Task 1 : Information about io_uring source
 
 ## Source

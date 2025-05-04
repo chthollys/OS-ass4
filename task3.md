@@ -1,5 +1,3 @@
-## Name : Jason Januardy
-## NIM  : 1313623035
 # Task 3: Data Structure Investigation
 
 Structure name | Defined in | Attributes | Caller Functions Source | source caller | usage
