@@ -8,7 +8,7 @@
 #include <net/net_trackers.h>
 
 struct io_zcrx_area {
-	struct net_iov_area	nia;
+	struct net_iov_area	nia; // Network I/O vector area
 	struct io_zcrx_ifq	*ifq;
 	atomic_t		*user_refs;
 
@@ -16,7 +16,6 @@ struct io_zcrx_area {
 	u16			area_id;
 	struct page		**pages;
 
-	/* freelist */
 	spinlock_t		freelist_lock ____cacheline_aligned_in_smp;
 	u32			free_count;
 	u32			*freelist;
@@ -40,16 +39,24 @@ struct io_zcrx_ifq {
 };
 
 #if defined(CONFIG_IO_URING_ZCRX)
+// Registers a zero-copy receive queue interface queue with io_uring
 int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
 			 struct io_uring_zcrx_ifq_reg __user *arg);
+
+// Unregisters all zero-copy receive queue interface queues from io_uring
 void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx);
+
+// Shuts down all zero-copy receive queue interface queues in io_uring
 void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx);
+
+// Receives data for zero-copy receive queue
 int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 		 struct socket *sock, unsigned int flags,
 		 unsigned issue_flags, unsigned int *len);
 #else
+// Fallback for when CONFIG_IO_URING_ZCRX is not defined
 static inline int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
-					struct io_uring_zcrx_ifq_reg __user *arg)
+				struct io_uring_zcrx_ifq_reg __user *arg)
 {
 	return -EOPNOTSUPP;
 }
@@ -60,14 +67,17 @@ static inline void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
 {
 }
 static inline int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-			       struct socket *sock, unsigned int flags,
-			       unsigned issue_flags, unsigned int *len)
+		       struct socket *sock, unsigned int flags,
+		       unsigned issue_flags, unsigned int *len)
 {
 	return -EOPNOTSUPP;
 }
 #endif
 
+// Receives data for zero-copy receive queue
 int io_recvzc(struct io_kiocb *req, unsigned int issue_flags);
+
+// Prepares a zero-copy receive operation
 int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
 
 #endif

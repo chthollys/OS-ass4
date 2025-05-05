@@ -32,6 +32,7 @@ struct io_waitid {
 	struct waitid_info info;
 };
 
+// Frees resources associated with an io_waitid request
 static void io_waitid_free(struct io_kiocb *req)
 {
 	struct io_waitid_async *iwa = req->async_data;
@@ -42,6 +43,7 @@ static void io_waitid_free(struct io_kiocb *req)
 	req->flags &= ~REQ_F_ASYNC_DATA;
 }
 
+// Copies signal information to a user-space compatible structure
 static bool io_waitid_compat_copy_si(struct io_waitid *iw, int signo)
 {
 	struct compat_siginfo __user *infop;
@@ -67,6 +69,7 @@ Efault:
 	goto done;
 }
 
+// Copies signal information to a user-space structure
 static bool io_waitid_copy_si(struct io_kiocb *req, int signo)
 {
 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
@@ -96,6 +99,7 @@ Efault:
 	goto done;
 }
 
+// Finalizes the io_waitid request and handles signal copying
 static int io_waitid_finish(struct io_kiocb *req, int ret)
 {
 	int signo = 0;
@@ -111,11 +115,12 @@ static int io_waitid_finish(struct io_kiocb *req, int ret)
 	return ret;
 }
 
+// Completes the io_waitid request and updates its result
 static void io_waitid_complete(struct io_kiocb *req, int ret)
 {
 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
 
-	/* anyone completing better be holding a reference */
+	// Ensure proper reference handling during completion
 	WARN_ON_ONCE(!(atomic_read(&iw->refs) & IO_WAITID_REF_MASK));
 
 	lockdep_assert_held(&req->ctx->uring_lock);
@@ -128,18 +133,16 @@ static void io_waitid_complete(struct io_kiocb *req, int ret)
 	io_req_set_res(req, ret, 0);
 }
 
+// Cancels an io_waitid request and removes it from the wait queue
 static bool __io_waitid_cancel(struct io_kiocb *req)
 {
 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
 	struct io_waitid_async *iwa = req->async_data;
 
-	/*
-	 * Mark us canceled regardless of ownership. This will prevent a
-	 * potential retry from a spurious wakeup.
-	 */
+	// Mark the request as canceled
 	atomic_or(IO_WAITID_CANCEL_FLAG, &iw->refs);
 
-	/* claim ownership */
+	// Claim ownership for cancellation
 	if (atomic_fetch_inc(&iw->refs) & IO_WAITID_REF_MASK)
 		return false;
 
@@ -151,18 +154,21 @@ static bool __io_waitid_cancel(struct io_kiocb *req)
 	return true;
 }
 
+// Handles cancellation of io_waitid requests
 int io_waitid_cancel(struct io_ring_ctx *ctx, struct io_cancel_data *cd,
 		     unsigned int issue_flags)
 {
 	return io_cancel_remove(ctx, cd, issue_flags, &ctx->waitid_list, __io_waitid_cancel);
 }
 
+// Removes all io_waitid requests for a given context
 bool io_waitid_remove_all(struct io_ring_ctx *ctx, struct io_uring_task *tctx,
 			  bool cancel_all)
 {
 	return io_cancel_remove_all(ctx, tctx, &ctx->waitid_list, cancel_all, __io_waitid_cancel);
 }
 
+// Drops a reference to an io_waitid request and queues task work if needed
 static inline bool io_waitid_drop_issue_ref(struct io_kiocb *req)
 {
 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
@@ -171,16 +177,14 @@ static inline bool io_waitid_drop_issue_ref(struct io_kiocb *req)
 	if (!atomic_sub_return(1, &iw->refs))
 		return false;
 
-	/*
-	 * Wakeup triggered, racing with us. It was prevented from
-	 * completing because of that, queue up the tw to do that.
-	 */
+	// Queue task work for completion
 	req->io_task_work.func = io_waitid_cb;
 	io_req_task_work_add(req);
 	remove_wait_queue(iw->head, &iwa->wo.child_wait);
 	return true;
 }
 
+// Callback function for handling waitid task work
 static void io_waitid_cb(struct io_kiocb *req, io_tw_token_t tw)
 {
 	struct io_waitid_async *iwa = req->async_data;
@@ -191,23 +195,16 @@ static void io_waitid_cb(struct io_kiocb *req, io_tw_token_t tw)
 
 	ret = __do_wait(&iwa->wo);
 
-	/*
-	 * If we get -ERESTARTSYS here, we need to re-arm and check again
-	 * to ensure we get another callback. If the retry works, then we can
-	 * just remove ourselves from the waitqueue again and finish the
-	 * request.
-	 */
 	if (unlikely(ret == -ERESTARTSYS)) {
 		struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
 
-		/* Don't retry if cancel found it meanwhile */
+		// Retry if not canceled
 		ret = -ECANCELED;
 		if (!(atomic_read(&iw->refs) & IO_WAITID_CANCEL_FLAG)) {
 			iw->head = &current->signal->wait_chldexit;
 			add_wait_queue(iw->head, &iwa->wo.child_wait);
 			ret = __do_wait(&iwa->wo);
 			if (ret == -ERESTARTSYS) {
-				/* retry armed, drop our ref */
 				io_waitid_drop_issue_ref(req);
 				return;
 			}
@@ -220,6 +217,7 @@ static void io_waitid_cb(struct io_kiocb *req, io_tw_token_t tw)
 	io_req_task_complete(req, tw);
 }
 
+// Wait queue callback for io_waitid requests
 static int io_waitid_wait(struct wait_queue_entry *wait, unsigned mode,
 			  int sync, void *key)
 {
@@ -232,7 +230,7 @@ static int io_waitid_wait(struct wait_queue_entry *wait, unsigned mode,
 	if (!pid_child_should_wake(wo, p))
 		return 0;
 
-	/* cancel is in progress */
+	// Handle cancellation in progress
 	if (atomic_fetch_inc(&iw->refs) & IO_WAITID_REF_MASK)
 		return 1;
 
@@ -242,6 +240,7 @@ static int io_waitid_wait(struct wait_queue_entry *wait, unsigned mode,
 	return 1;
 }
 
+// Prepares an io_waitid request for execution
 int io_waitid_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
@@ -262,6 +261,7 @@ int io_waitid_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+// Executes an io_waitid request
 int io_waitid(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
@@ -274,19 +274,8 @@ int io_waitid(struct io_kiocb *req, unsigned int issue_flags)
 	if (ret)
 		goto done;
 
-	/*
-	 * Mark the request as busy upfront, in case we're racing with the
-	 * wakeup. If we are, then we'll notice when we drop this initial
-	 * reference again after arming.
-	 */
 	atomic_set(&iw->refs, 1);
 
-	/*
-	 * Cancel must hold the ctx lock, so there's no risk of cancelation
-	 * finding us until a) we remain on the list, and b) the lock is
-	 * dropped. We only need to worry about racing with the wakeup
-	 * callback.
-	 */
 	io_ring_submit_lock(ctx, issue_flags);
 	hlist_add_head(&req->hash_node, &ctx->waitid_list);
 
@@ -297,19 +286,11 @@ int io_waitid(struct io_kiocb *req, unsigned int issue_flags)
 
 	ret = __do_wait(&iwa->wo);
 	if (ret == -ERESTARTSYS) {
-		/*
-		 * Nobody else grabbed a reference, it'll complete when we get
-		 * a waitqueue callback, or if someone cancels it.
-		 */
 		if (!io_waitid_drop_issue_ref(req)) {
 			io_ring_submit_unlock(ctx, issue_flags);
 			return IOU_ISSUE_SKIP_COMPLETE;
 		}
 
-		/*
-		 * Wakeup triggered, racing with us. It was prevented from
-		 * completing because of that, queue up the tw to do that.
-		 */
 		io_ring_submit_unlock(ctx, issue_flags);
 		return IOU_ISSUE_SKIP_COMPLETE;
 	}

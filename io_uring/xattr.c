@@ -22,6 +22,7 @@ struct io_xattr {
 	struct filename			*filename;
 };
 
+// Cleans up resources allocated for an io_kiocb request related to xattr operations.
 void io_xattr_cleanup(struct io_kiocb *req)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -33,6 +34,7 @@ void io_xattr_cleanup(struct io_kiocb *req)
 	kvfree(ix->ctx.kvalue);
 }
 
+// Finalizes an xattr operation, cleans up resources, and sets the result of the request.
 static void io_xattr_finish(struct io_kiocb *req, int ret)
 {
 	req->flags &= ~REQ_F_NEED_CLEANUP;
@@ -41,6 +43,7 @@ static void io_xattr_finish(struct io_kiocb *req, int ret)
 	io_req_set_res(req, ret, 0);
 }
 
+// Prepares an io_kiocb request for a getxattr operation on a file descriptor.
 static int __io_getxattr_prep(struct io_kiocb *req,
 			      const struct io_uring_sqe *sqe)
 {
@@ -73,11 +76,13 @@ static int __io_getxattr_prep(struct io_kiocb *req,
 	return 0;
 }
 
+// Prepares an io_kiocb request for a getxattr operation on a file descriptor (public interface).
 int io_fgetxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return __io_getxattr_prep(req, sqe);
 }
 
+// Prepares an io_kiocb request for a getxattr operation on a file path.
 int io_getxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -100,6 +105,7 @@ int io_getxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+// Executes a getxattr operation on a file descriptor.
 int io_fgetxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -112,6 +118,7 @@ int io_fgetxattr(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+// Executes a getxattr operation on a file path.
 int io_getxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -125,6 +132,7 @@ int io_getxattr(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+// Prepares an io_kiocb request for a setxattr operation on a file descriptor.
 static int __io_setxattr_prep(struct io_kiocb *req,
 			const struct io_uring_sqe *sqe)
 {
@@ -154,6 +162,7 @@ static int __io_setxattr_prep(struct io_kiocb *req,
 	return 0;
 }
 
+// Prepares an io_kiocb request for a setxattr operation on a file path.
 int io_setxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -176,11 +185,13 @@ int io_setxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+// Prepares an io_kiocb request for a setxattr operation on a file descriptor (public interface).
 int io_fsetxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return __io_setxattr_prep(req, sqe);
 }
 
+// Executes a setxattr operation on a file descriptor.
 int io_fsetxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -193,6 +204,7 @@ int io_fsetxattr(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+// Executes a setxattr operation on a file path.
 int io_setxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
