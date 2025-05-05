@@ -20,6 +20,7 @@ struct io_ftrunc {
 	loff_t				len;
 };
 
+// Function to prepare a file truncation request. Validates the input and sets up the request structure.
 int io_ftruncate_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_ftrunc *ft = io_kiocb_to_cmd(req, struct io_ftrunc);
@@ -34,6 +35,7 @@ int io_ftruncate_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+// Function to execute a file truncation request. Performs the truncation and sets the result in the request structure.
 int io_ftruncate(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_ftrunc *ft = io_kiocb_to_cmd(req, struct io_ftrunc);

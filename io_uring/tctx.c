@@ -12,6 +12,7 @@
 #include "io_uring.h"
 #include "tctx.h"
 
+// Initializes the work queue offload for the io_uring context
 static struct io_wq *io_init_wq_offload(struct io_ring_ctx *ctx,
 					struct task_struct *task)
 {
@@ -44,6 +45,7 @@ static struct io_wq *io_init_wq_offload(struct io_ring_ctx *ctx,
 	return io_wq_create(concurrency, &data);
 }
 
+// Frees the io_uring task context for a given task
 void __io_uring_free(struct task_struct *tsk)
 {
 	struct io_uring_task *tctx = tsk->io_uring;
@@ -68,6 +70,7 @@ void __io_uring_free(struct task_struct *tsk)
 	tsk->io_uring = NULL;
 }
 
+// Allocates the io_uring task context for a given task
 __cold int io_uring_alloc_task_context(struct task_struct *task,
 				       struct io_ring_ctx *ctx)
 {
@@ -103,6 +106,7 @@ __cold int io_uring_alloc_task_context(struct task_struct *task,
 	return 0;
 }
 
+// Adds a task context node to the io_uring context
 int __io_uring_add_tctx_node(struct io_ring_ctx *ctx)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -145,6 +149,7 @@ int __io_uring_add_tctx_node(struct io_ring_ctx *ctx)
 	return 0;
 }
 
+// Adds a task context node to the io_uring context from a submission
 int __io_uring_add_tctx_node_from_submit(struct io_ring_ctx *ctx)
 {
 	int ret;
@@ -161,9 +166,7 @@ int __io_uring_add_tctx_node_from_submit(struct io_ring_ctx *ctx)
 	return 0;
 }
 
-/*
- * Remove this io_uring_file -> task mapping.
- */
+// Removes the io_uring file to task mapping
 __cold void io_uring_del_tctx_node(unsigned long index)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -187,6 +190,7 @@ __cold void io_uring_del_tctx_node(unsigned long index)
 	kfree(node);
 }
 
+// Cleans up the io_uring task context
 __cold void io_uring_clean_tctx(struct io_uring_task *tctx)
 {
 	struct io_wq *wq = tctx->io_wq;
@@ -207,6 +211,7 @@ __cold void io_uring_clean_tctx(struct io_uring_task *tctx)
 	}
 }
 
+// Unregisters the ring file descriptors for the io_uring task
 void io_uring_unreg_ringfd(void)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -220,6 +225,7 @@ void io_uring_unreg_ringfd(void)
 	}
 }
 
+// Adds a registered file to the io_uring task
 int io_ring_add_registered_file(struct io_uring_task *tctx, struct file *file,
 				     int start, int end)
 {
@@ -235,6 +241,7 @@ int io_ring_add_registered_file(struct io_uring_task *tctx, struct file *file,
 	return -EBUSY;
 }
 
+// Adds a registered file descriptor to the io_uring task
 static int io_ring_add_registered_fd(struct io_uring_task *tctx, int fd,
 				     int start, int end)
 {
@@ -254,14 +261,7 @@ static int io_ring_add_registered_fd(struct io_uring_task *tctx, int fd,
 	return offset;
 }
 
-/*
- * Register a ring fd to avoid fdget/fdput for each io_uring_enter()
- * invocation. User passes in an array of struct io_uring_rsrc_update
- * with ->data set to the ring_fd, and ->offset given for the desired
- * index. If no index is desired, application may set ->offset == -1U
- * and we'll find an available index. Returns number of entries
- * successfully processed, or < 0 on error if none were processed.
- */
+// Registers a ring file descriptor for the io_uring context
 int io_ringfd_register(struct io_ring_ctx *ctx, void __user *__arg,
 		       unsigned nr_args)
 {
@@ -321,6 +321,7 @@ int io_ringfd_register(struct io_ring_ctx *ctx, void __user *__arg,
 	return i ? i : ret;
 }
 
+// Unregisters a ring file descriptor for the io_uring context
 int io_ringfd_unregister(struct io_ring_ctx *ctx, void __user *__arg,
 			 unsigned nr_args)
 {
