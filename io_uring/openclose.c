@@ -36,6 +36,11 @@ struct io_fixed_install {
 	unsigned int			o_flags;
 };
 
+/*
+ * Checks if the open operation should be forced to asynchronous mode.
+ * It returns true if the flags include O_TRUNC, O_CREAT, or __O_TMPFILE,
+ * as these flags typically result in -EAGAIN and should be handled asynchronously.
+ */
 static bool io_openat_force_async(struct io_open *open)
 {
 	/*
@@ -47,6 +52,15 @@ static bool io_openat_force_async(struct io_open *open)
 	return open->how.flags & (O_TRUNC | O_CREAT | __O_TMPFILE);
 }
 
+/*
+ * Prepares the io_uring openat operation.
+ * It sets up the file descriptor, filename, and open flags.
+ * Additionally, it ensures the open flags are valid and applies necessary modifications 
+ * (e.g., adding O_LARGEFILE if required).
+ * It also checks for file slot and CLOEXEC flags consistency, 
+ * handles filename retrieval, and determines if the operation should be forced asynchronous.
+ * The function returns 0 on success or an error code if the preparation fails.
+ */
 static int __io_openat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_open *open = io_kiocb_to_cmd(req, struct io_open);
@@ -82,6 +96,11 @@ static int __io_openat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe
 	return 0;
 }
 
+/*
+ * Prepares the io_uring openat operation by extracting the open flags and mode from the submission queue entry (sqe).
+ * It uses the extracted values to build the open_how structure and then delegates to the helper function __io_openat_prep 
+ * for further preparation. The function returns the result of __io_openat_prep, which indicates success or failure.
+ */
 int io_openat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_open *open = io_kiocb_to_cmd(req, struct io_open);
@@ -92,6 +111,11 @@ int io_openat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return __io_openat_prep(req, sqe);
 }
 
+/*
+ * Prepares the io_uring openat2 operation by copying the user-provided open_how structure from the submission queue entry (sqe).
+ * It validates the size of the open_how structure and ensures it's large enough. After copying the structure, it calls 
+ * the helper function __io_openat_prep to complete the preparation. The function returns the result of __io_openat_prep.
+ */
 int io_openat2_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_open *open = io_kiocb_to_cmd(req, struct io_open);
@@ -111,6 +135,13 @@ int io_openat2_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return __io_openat_prep(req, sqe);
 }
 
+/*
+ * Handles the io_uring openat2 operation by opening a file based on the parameters in the io_uring submission queue entry (sqe).
+ * It first builds the necessary flags for the open operation and attempts to open the file using the provided flags.
+ * If the file is successfully opened, it installs the file descriptor. In case of errors, it handles retries and cleans up any resources.
+ * The function also handles non-blocking flags and retries the operation if needed.
+ * It ensures that the resources are properly cleaned up, regardless of whether the operation succeeds or fails.
+ */
 int io_openat2(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_open *open = io_kiocb_to_cmd(req, struct io_open);
@@ -172,11 +203,19 @@ err:
 	return IOU_OK;
 }
 
+/*
+ * A wrapper function for the io_openat2 operation.
+ * It simply delegates the call to io_openat2 to handle the file opening logic.
+ */
 int io_openat(struct io_kiocb *req, unsigned int issue_flags)
 {
 	return io_openat2(req, issue_flags);
 }
 
+/*
+ * Cleans up resources associated with an open operation.
+ * It releases the filename if it was allocated during the operation.
+ */
 void io_open_cleanup(struct io_kiocb *req)
 {
 	struct io_open *open = io_kiocb_to_cmd(req, struct io_open);
@@ -185,6 +224,10 @@ void io_open_cleanup(struct io_kiocb *req)
 		putname(open->filename);
 }
 
+/*
+ * Closes a fixed file descriptor and removes it from the io_uring context.
+ * The function ensures proper locking during the submission process.
+ */
 int __io_close_fixed(struct io_ring_ctx *ctx, unsigned int issue_flags,
 		     unsigned int offset)
 {
@@ -197,6 +240,10 @@ int __io_close_fixed(struct io_ring_ctx *ctx, unsigned int issue_flags,
 	return ret;
 }
 
+/*
+ * Closes a fixed file descriptor associated with the request, ensuring
+ * the correct context and file slot are used.
+ */
 static inline int io_close_fixed(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_close *close = io_kiocb_to_cmd(req, struct io_close);
@@ -204,6 +251,12 @@ static inline int io_close_fixed(struct io_kiocb *req, unsigned int issue_flags)
 	return __io_close_fixed(req->ctx, issue_flags, close->file_slot - 1);
 }
 
+/*
+ * Prepares the request for closing a file descriptor:
+ * Verifies the provided fields (offset, address, length, etc.) are valid.
+ * Ensures that the request does not contain a fixed file descriptor.
+ * Sets the file descriptor and file slot for the close operation.
+ */
 int io_close_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_close *close = io_kiocb_to_cmd(req, struct io_close);
@@ -221,6 +274,14 @@ int io_close_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/*
+ * Handles the closing of a file descriptor:
+ * First checks if the file is fixed and performs the necessary cleanup.
+ * Then, locks the file structure to perform the lookup of the file descriptor.
+ * If the file is found and does not use io_uring-specific operations, it proceeds to close it.
+ * If the file requires a flush, and the operation is non-blocking, it returns -EAGAIN to retry.
+ * Finally, the file is closed safely, and the result is updated in the request.
+ */
 int io_close(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct files_struct *files = current->files;
@@ -260,6 +321,12 @@ err:
 	return IOU_OK;
 }
 
+/*
+ * Prepares a fixed file descriptor for installation by verifying the validity of the input conditions. 
+ * It ensures that the request is specifically for a fixed file descriptor. 
+ * The function checks that no invalid flags are provided and confirms that the task's credentials are appropriately used. 
+ * By default, the `O_CLOEXEC` flag is set unless the `IORING_FIXED_FD_NO_CLOEXEC` flag is specified, in which case the `O_CLOEXEC` flag is disabled.
+ */
 int io_install_fixed_fd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_fixed_install *ifi;
@@ -290,6 +357,10 @@ int io_install_fixed_fd_prep(struct io_kiocb *req, const struct io_uring_sqe *sq
 	return 0;
 }
 
+/*
+ * Installs a fixed file descriptor by calling the appropriate function to receive the file descriptor with the specified flags. 
+ * If the operation fails, the request is marked as failed, and the result is set accordingly.
+ */
 int io_install_fixed_fd(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_fixed_install *ifi;

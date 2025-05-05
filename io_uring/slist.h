@@ -18,6 +18,7 @@
 	(list)->first = NULL;					\
 } while (0)
 
+/* Insert node after specified position, updating next pointers accordingly */
 static inline void wq_list_add_after(struct io_wq_work_node *node,
 				     struct io_wq_work_node *pos,
 				     struct io_wq_work_list *list)
@@ -30,6 +31,7 @@ static inline void wq_list_add_after(struct io_wq_work_node *node,
 		list->last = node;
 }
 
+/* Append node to end of list, updating first/last pointers if needed */
 static inline void wq_list_add_tail(struct io_wq_work_node *node,
 				    struct io_wq_work_list *list)
 {
@@ -43,6 +45,7 @@ static inline void wq_list_add_tail(struct io_wq_work_node *node,
 	}
 }
 
+/* Prepend node to beginning of list, updating first pointer */
 static inline void wq_list_add_head(struct io_wq_work_node *node,
 				    struct io_wq_work_list *list)
 {
@@ -52,6 +55,7 @@ static inline void wq_list_add_head(struct io_wq_work_node *node,
 	WRITE_ONCE(list->first, node);
 }
 
+/* Split list after specified node, properly handling first/last pointers */
 static inline void wq_list_cut(struct io_wq_work_list *list,
 			       struct io_wq_work_node *last,
 			       struct io_wq_work_node *prev)
@@ -67,6 +71,7 @@ static inline void wq_list_cut(struct io_wq_work_list *list,
 	last->next = NULL;
 }
 
+/* Internal splice implementation that joins two lists and clears source list */
 static inline void __wq_list_splice(struct io_wq_work_list *list,
 				    struct io_wq_work_node *to)
 {
@@ -75,6 +80,7 @@ static inline void __wq_list_splice(struct io_wq_work_list *list,
 	INIT_WQ_LIST(list);
 }
 
+/* Public splice function that checks for empty list before splicing */
 static inline bool wq_list_splice(struct io_wq_work_list *list,
 				  struct io_wq_work_node *to)
 {
@@ -85,6 +91,7 @@ static inline bool wq_list_splice(struct io_wq_work_list *list,
 	return false;
 }
 
+/* Stack push operation - adds node at head of stack */
 static inline void wq_stack_add_head(struct io_wq_work_node *node,
 				     struct io_wq_work_node *stack)
 {
@@ -92,6 +99,7 @@ static inline void wq_stack_add_head(struct io_wq_work_node *node,
 	stack->next = node;
 }
 
+/* Remove node from list using cut operation */
 static inline void wq_list_del(struct io_wq_work_list *list,
 			       struct io_wq_work_node *node,
 			       struct io_wq_work_node *prev)
@@ -99,6 +107,7 @@ static inline void wq_list_del(struct io_wq_work_list *list,
 	wq_list_cut(list, node, prev);
 }
 
+/* Stack pop operation - extracts and returns next node from stack */
 static inline
 struct io_wq_work_node *wq_stack_extract(struct io_wq_work_node *stack)
 {
@@ -108,6 +117,7 @@ struct io_wq_work_node *wq_stack_extract(struct io_wq_work_node *stack)
 	return node;
 }
 
+/* Get next work item by following list.next pointer and container_of */
 static inline struct io_wq_work *wq_next_work(struct io_wq_work *work)
 {
 	if (!work->list.next)

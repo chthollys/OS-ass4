@@ -18,10 +18,10 @@
 | net.c                  | net.h                |
 | nop.c                  | nop.h                |
 | notif.c (Andris)       | notif.h (Andris)     |
-| opdef.c                | opdef.h              |
-| openclose.c            | openclose.h          |
-| poll.c                 | poll.h               |
-|                        | refs.h               |
+|               |             |
+|           |        |
+|                |               |
+|                        |               |
 | register.c             | register.h           |
 | rsrc.c                 | rsrc.h               |
 | rw.c                   | rw.h                 |

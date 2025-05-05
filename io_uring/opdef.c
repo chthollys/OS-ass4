@@ -39,12 +39,21 @@
 #include "truncate.h"
 #include "zcrx.h"
 
+/*
+ * io_no_issue - Handles cases where no I/O operation is performed.
+ * Always triggers a warning and returns -ECANCELED.
+ */
+
 static int io_no_issue(struct io_kiocb *req, unsigned int issue_flags)
 {
 	WARN_ON_ONCE(1);
 	return -ECANCELED;
 }
 
+/*
+ * io_eopnotsupp_prep - Prepares an I/O operation that is not supported.
+ * Always returns -EOPNOTSUPP to indicate the operation is not supported.
+ */
 static __maybe_unused int io_eopnotsupp_prep(struct io_kiocb *kiocb,
 					     const struct io_uring_sqe *sqe)
 {
@@ -817,6 +826,11 @@ const struct io_cold_def io_cold_defs[] = {
 	},
 };
 
+/* 
+ * Returns the name of the operation corresponding to the given opcode.
+ * If the opcode is invalid (greater than or equal to IORING_OP_LAST), 
+ * it returns "INVALID".
+ */
 const char *io_uring_get_opcode(u8 opcode)
 {
 	if (opcode < IORING_OP_LAST)
@@ -824,6 +838,11 @@ const char *io_uring_get_opcode(u8 opcode)
 	return "INVALID";
 }
 
+/*
+ * Checks if the given opcode is supported by the io_uring framework.
+ * An opcode is considered supported if it is less than IORING_OP_LAST
+ * and its corresponding preparation function is not io_eopnotsupp_prep.
+ */
 bool io_uring_op_supported(u8 opcode)
 {
 	if (opcode < IORING_OP_LAST &&
@@ -832,6 +851,12 @@ bool io_uring_op_supported(u8 opcode)
 	return false;
 }
 
+/*
+ * Initializes the io_uring operation tables and verifies their consistency.
+ * It checks that the array sizes match the expected number of operations 
+ * and ensures that each operation has valid preparation and issue functions 
+ * when required. A warning is issued if an operation lacks a name.
+ */
 void __init io_uring_optable_init(void)
 {
 	int i;

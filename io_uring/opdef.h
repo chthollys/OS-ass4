@@ -45,7 +45,17 @@ struct io_cold_def {
 extern const struct io_issue_def io_issue_defs[];
 extern const struct io_cold_def io_cold_defs[];
 
+/**
+ * Checks if an IO operation is supported based on its opcode.
+ * 
+ * @param opcode The opcode to check.
+ * @return True if the operation is supported, false otherwise.
+ */
 bool io_uring_op_supported(u8 opcode);
 
+/**
+ * Initializes the IO ring's operation table.
+ * This function sets up the operation definitions for the IO ring context.
+ */
 void io_uring_optable_init(void);
 #endif
