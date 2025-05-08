@@ -684,8 +684,8 @@ fail:
 }
 
 /*
- * - Unregisters the buffers in the I/O ring context by freeing the buffer table.
- * - If the buffer table is empty, it returns an error.
+ * Unregisters the buffers in the I/O ring context by freeing the buffer table.
+ * If the buffer table is empty, it returns an error.
  */
 int io_sqe_buffers_unregister(struct io_ring_ctx *ctx)
 {
@@ -737,10 +737,10 @@ static bool headpage_already_acct(struct io_ring_ctx *ctx, struct page **pages,
 }
 
 /*
- * - Accounts for the memory pages used by the I/O buffer.
- * - It pin the pages and checks if the compound head pages are already accounted.
- * - If pages are already accounted, skips further accounting.
- * - Returns the result of memory accounting, or 0 if no pages need to be accounted.
+ * Accounts for the memory pages used by the I/O buffer.
+ * It pin the pages and checks if the compound head pages are already accounted.
+ * If pages are already accounted, skips further accounting.
+ * Returns the result of memory accounting, or 0 if no pages need to be accounted.
  */
 static int io_buffer_account_pin(struct io_ring_ctx *ctx, struct page **pages,
 				 int nr_pages, struct io_mapped_ubuf *imu,
@@ -775,9 +775,9 @@ static int io_buffer_account_pin(struct io_ring_ctx *ctx, struct page **pages,
 }
 
 /*
- * - Coalesces the buffer pages into fewer buffer entries for efficiency.
- * - Reduces the number of vector entries used for mapping pages.
- * - The function unpins user pages after they are coalesced.
+ * Coalesces the buffer pages into fewer buffer entries for efficiency.
+ * Reduces the number of vector entries used for mapping pages.
+ * The function unpins user pages after they are coalesced.
  */
 static bool io_coalesce_buffer(struct page ***pages, int *nr_pages,
 				struct io_imu_folio_data *data)
@@ -822,9 +822,9 @@ static bool io_coalesce_buffer(struct page ***pages, int *nr_pages,
 }
 
 /*
- * - Checks if the pages in the buffer are contiguous within a folio and if
- *   the folios have the same page count, except for the head and tail.
- * - Also checks if the pages should be coalesced into a single buffer entry.
+ * Checks if the pages in the buffer are contiguous within a folio and if
+ *  the folios have the same page count, except for the head and tail.
+ * Also checks if the pages should be coalesced into a single buffer entry.
  */
 bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
 			      struct io_imu_folio_data *data)
@@ -873,10 +873,10 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
 }
 
 /*
- * - Registers a buffer to be used in I/O operations.
- * - Pins the user pages and handles potential coalescing of huge pages.
- * - Accounts for the memory pages and sets up the buffer for I/O submission.
- * - Returns an I/O resource node for the buffer or an error if registration fails.
+ * Registers a buffer to be used in I/O operations.
+ * Pins the user pages and handles potential coalescing of huge pages.
+ * Accounts for the memory pages and sets up the buffer for I/O submission.
+ * Returns an I/O resource node for the buffer or an error if registration fails.
  */
 static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
 						   struct iovec *iov,

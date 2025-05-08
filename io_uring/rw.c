@@ -37,8 +37,8 @@ struct io_rw {
 };
 
 // Checks whether the file supports non-blocking (NOWAIT) operations
-// - Return true if the file supports it
-// - Uses vfs_poll to determine support
+// Return true if the file supports it
+// Uses vfs_poll to determine support
 static bool io_file_supports_nowait(struct io_kiocb *req, __poll_t mask)
 {
 	/* If FMODE_NOWAIT is set for a file, we're golden */
@@ -55,8 +55,8 @@ static bool io_file_supports_nowait(struct io_kiocb *req, __poll_t mask)
 }
 
 // Prepares the read/write buffer from user space in compatibility mode (32-bit)
-// - Translates address and copies iovec structure from user space
-// - Updates length accordingly
+// Translates address and copies iovec structure from user space
+// Updates length accordingly
 static int io_iov_compat_buffer_select_prep(struct io_rw *rw)
 {
 	struct compat_iovec __user *uiov = u64_to_user_ptr(rw->addr);
@@ -69,8 +69,8 @@ static int io_iov_compat_buffer_select_prep(struct io_rw *rw)
 }
 
 // Prepares the read/write buffer from user space, choosing compat or native
-// - Calls appropriate function based on compatibility mode
-// - Imports the buffer and validates length
+// Calls appropriate function based on compatibility mode
+// Imports the buffer and validates length
 static int io_iov_buffer_select_prep(struct io_kiocb *req)
 {
 	struct iovec __user *uiov;
@@ -92,8 +92,8 @@ static int io_iov_buffer_select_prep(struct io_kiocb *req)
 
 
 // Imports I/O vector from user space into a kernel structure
-// - Uses system helpers to import iovec array
-// - Fills kernel-side structure for vectored I/O
+// Uses system helpers to import iovec array
+// Fills kernel-side structure for vectored I/O
 static int io_import_vec(int ddir, struct io_kiocb *req,
 			 struct io_async_rw *io,
 			 const struct iovec __user *uvec,
@@ -122,8 +122,8 @@ static int io_import_vec(int ddir, struct io_kiocb *req,
 }
 
 // Imports buffer for read/write operation from user memory or pool
-// - Chooses import method based on buffer type
-// - Supports normal or buffer-selected I/O
+// Chooses import method based on buffer type
+// Supports normal or buffer-selected I/O
 static int __io_import_rw_buffer(int ddir, struct io_kiocb *req,
 			     struct io_async_rw *io,
 			     unsigned int issue_flags)
@@ -147,8 +147,8 @@ static int __io_import_rw_buffer(int ddir, struct io_kiocb *req,
 }
 
 // Wrapper for __io_import_rw_buffer that also saves iterator state
-// - Performs buffer import
-// - Stores state if necessary for later restoration
+// Performs buffer import
+// Stores state if necessary for later restoration
 static inline int io_import_rw_buffer(int rw, struct io_kiocb *req,
 				      struct io_async_rw *io,
 				      unsigned int issue_flags)
@@ -164,8 +164,8 @@ static inline int io_import_rw_buffer(int rw, struct io_kiocb *req,
 }
 
 // Recycles async_rw structure if possible for memory efficiency
-// - Frees or returns structure to memory cache
-// - Clears relevant fields and flags
+// Frees or returns structure to memory cache
+// Clears relevant fields and flags
 static void io_rw_recycle(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_async_rw *rw = req->async_data;
@@ -184,8 +184,8 @@ static void io_rw_recycle(struct io_kiocb *req, unsigned int issue_flags)
 }
 
 // Cleans up data used by a read/write operation
-// - Handles vector unmapping and memory cleanup
-// - Skips if offload mechanism is used
+// Handles vector unmapping and memory cleanup
+// Skips if offload mechanism is used
 static void io_req_rw_cleanup(struct io_kiocb *req, unsigned int issue_flags)
 {
 	/*
@@ -222,8 +222,8 @@ static void io_req_rw_cleanup(struct io_kiocb *req, unsigned int issue_flags)
 }
 
 // Allocates memory for async_rw structure used in async operations
-// - Allocates from slab cache
-// - Initializes fields for later use
+// Allocates from slab cache
+// Initializes fields for later use
 static int io_rw_alloc_async(struct io_kiocb *req)
 {
 	struct io_ring_ctx *ctx = req->ctx;
@@ -239,7 +239,7 @@ static int io_rw_alloc_async(struct io_kiocb *req)
 }
 
 // Saves iterator metadata state for potential restore
-// - Stores current iterator position and seed
+// Stores current iterator position and seed
 static inline void io_meta_save_state(struct io_async_rw *io)
 {
 	io->meta_state.seed = io->meta.seed;
@@ -247,7 +247,7 @@ static inline void io_meta_save_state(struct io_async_rw *io)
 }
 
 // Restores metadata iterator state if operation used metadata
-// - Restores saved position and seed
+// Restores saved position and seed
 static inline void io_meta_restore(struct io_async_rw *io, struct kiocb *kiocb)
 {
 	if (kiocb->ki_flags & IOCB_HAS_METADATA) {
@@ -257,8 +257,8 @@ static inline void io_meta_restore(struct io_async_rw *io, struct kiocb *kiocb)
 }
 
 // Prepares metadata-based integrity (PI) for read/write operations
-// - Imports integrity attributes from user space
-// - Validates and applies to buffer
+// Imports integrity attributes from user space
+// Validates and applies to buffer
 static int io_prep_rw_pi(struct io_kiocb *req, struct io_rw *rw, int ddir,
 			 u64 attr_ptr, u64 attr_type_mask)
 {
@@ -287,8 +287,8 @@ static int io_prep_rw_pi(struct io_kiocb *req, struct io_rw *rw, int ddir,
 }
 
 // Prepares read/write operation including allocation, priority, and completion handler
-// - Allocates and sets up I/O context
-// - Initializes fields and handlers
+// Allocates and sets up I/O context
+// Initializes fields and handlers
 static int __io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
 			int ddir)
 {
@@ -341,8 +341,8 @@ static int __io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
 }
 
 // Imports buffer used for read/write operation
-// - Handles standard or selected buffer logic
-// - Delegates to import functions
+// Handles standard or selected buffer logic
+// Delegates to import functions
 static int io_rw_do_import(struct io_kiocb *req, int ddir)
 {
 	if (io_do_buffer_select(req))
@@ -352,8 +352,8 @@ static int io_rw_do_import(struct io_kiocb *req, int ddir)
 }
 
 // Fully prepares read/write operation, including buffer and optional metadata
-// - Calls internal prep function
-// - Imports buffer and configures optional metadata
+// Calls internal prep function
+// Imports buffer and configures optional metadata
 static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
 		      int ddir)
 {
@@ -367,23 +367,23 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
 }
 
 // Main setup function for read operations
-// - Sets direction to read
-// - Calls read/write preparation logic
+// Sets direction to read
+// Calls read/write preparation logic
 int io_prep_read(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return io_prep_rw(req, sqe, ITER_DEST);
 }
 
 // Main setup function for write operations
-// - Sets direction to write
-// - Calls read/write preparation logic
+// Sets direction to write
+// Calls read/write preparation logic
 int io_prep_write(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return io_prep_rw(req, sqe, ITER_SOURCE);
 }
 
 // Prepares readv/writev operation, supporting multiple buffers and buffer selection
-// - Sets up vectored I/O and verifies input
+// Sets up vectored I/O and verifies input
 static int io_prep_rwv(struct io_kiocb *req, const struct io_uring_sqe *sqe,
 		       int ddir)
 {
@@ -403,16 +403,16 @@ static int io_prep_rwv(struct io_kiocb *req, const struct io_uring_sqe *sqe,
 }
 
 // Main setup function for readv operation
-// - Configures for vectored read
-// - Calls RWV preparation
+// Configures for vectored read
+// Calls RWV preparation
 int io_prep_readv(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return io_prep_rwv(req, sqe, ITER_DEST);
 }
 
 // Main setup function for writev operation
-// - Configures for vectored write
-// - Calls RWV preparation
+// Configures for vectored write
+// Calls RWV preparation
 int io_prep_writev(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return io_prep_rwv(req, sqe, ITER_SOURCE);

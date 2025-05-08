@@ -435,7 +435,7 @@ void io_poll_task_func(struct io_kiocb *req, io_tw_token_t tw)
 }
 
 /**
- * io_poll_cancel_req - Cancel an active poll request
+ * Cancel an active poll request
  * @req: Poll request to cancel
  *
  * Marks the request as cancelled and forces its completion.
@@ -450,7 +450,7 @@ static void io_poll_cancel_req(struct io_kiocb *req)
 #define IO_ASYNC_POLL_COMMON	(EPOLLONESHOT | EPOLLPRI)
 
 /*
- * io_pollfree_wake - Cancels the polling request and cleans up the waitqueue.
+ * Cancels the polling request and cleans up the waitqueue.
  * 
  * This function marks the polling request as cancelled, ensures that it is processed, 
  * removes the request from the waitqueue, and clears the head of the poll structure 

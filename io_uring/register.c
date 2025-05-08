@@ -36,7 +36,7 @@
 				 IORING_REGISTER_LAST + IORING_OP_LAST)
 
 /* 
- * This function probes the io_uring capabilities based on the provided user input arguments.
+ * probes the io_uring capabilities based on the provided user input arguments.
  * It fills an io_uring_probe structure with information about the available operations
  * and their flags, indicating which operations are supported by the kernel.
  */
@@ -80,7 +80,7 @@ out:
 }
 
 /* 
- * This function unregisters a personality from the io_uring context by erasing it from
+ * unregisters a personality from the io_uring context by erasing it from
  * the personalities map based on the provided personality id. If the personality is found,
  * it is released, and the function returns 0. Otherwise, it returns -EINVAL.
  */
@@ -99,7 +99,7 @@ int io_unregister_personality(struct io_ring_ctx *ctx, unsigned id)
 
 
 /* 
- * This function registers a new personality for the current context by assigning a unique id
+ * registers a new personality for the current context by assigning a unique id
  * and storing the current credentials. The new id is allocated cyclically from the context's 
  * personality map. The function returns the assigned id or a negative error code.
  */
@@ -121,7 +121,7 @@ static int io_register_personality(struct io_ring_ctx *ctx)
 }
 
 /* 
- * This function parses the restrictions provided by the user and populates the restrictions 
+ * parses the restrictions provided by the user and populates the restrictions 
  * structure in the io_uring context. It ensures that the restrictions are valid and that no
  * unsupported or invalid opcodes are set.
  */
@@ -176,7 +176,7 @@ err:
 }
 
 /* 
- * This function registers io_uring restrictions for the provided context. It ensures that
+ * registers io_uring restrictions for the provided context. It ensures that
  * the rings are disabled before applying restrictions, and allows only one registration of
  * restrictions at a time.
  */
@@ -203,7 +203,7 @@ static __cold int io_register_restrictions(struct io_ring_ctx *ctx,
 }
 
 /* 
- * This function enables the io_uring rings for the provided context, removing the "disabled"
+ * enables the io_uring rings for the provided context, removing the "disabled"
  * flag, and handling any associated flags like SQPOLL (single issuer) and restrictions.
  * It also wakes up any waiters on the submission queue if necessary.
  */
@@ -233,7 +233,7 @@ static int io_register_enable_rings(struct io_ring_ctx *ctx)
 
 
 /* 
- * This function sets the CPU affinity for the I/O worker queue of an io_uring context.
+ * sets the CPU affinity for the I/O worker queue of an io_uring context.
  * It either applies the new CPU affinity to a general I/O worker queue or to a specific
  * one managed by the SQPOLL mechanism.
  */
@@ -254,7 +254,7 @@ static __cold int __io_register_iowq_aff(struct io_ring_ctx *ctx,
 }
 
 /* 
- * This function registers a new CPU affinity for an io_uring context. The CPU mask is
+ * registers a new CPU affinity for an io_uring context. The CPU mask is
  * passed from the user, and the affinity is applied either to a general I/O worker queue
  * or one managed by the SQPOLL mechanism.
  */
