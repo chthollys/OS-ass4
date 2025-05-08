@@ -18,25 +18,7 @@
 | net.c                  | net.h                |
 | nop.c                  | nop.h                |
 | notif.c (Andris)       | notif.h (Andris)     |
-|               |             |
-|           |        |
-|                |               |
-|                        |               |
-<<<<<<< HEAD
-|              |          |
-|              |              |
-|                  |                 |
-|                        |             |
-|          |            |
-|  (Fadlin)      | (Fadlin)    |
-=======
-|            |           |
-|               |               |
-|              |             |
-|                        |            |
-|             |            |
-|  (Fadlin)      |  (Fadlin)    |
->>>>>>> 619e55d2b62469cbb1570a338df25c385860c3b2
+|  (Fadlin)              | (Fadlin)             |
 | statx.c                | statx.h              |
 | sync.c                 | sync.h               |
 | tctx.c                 | tctx.h               |
