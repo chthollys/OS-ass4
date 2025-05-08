@@ -16,6 +16,18 @@
 #include "rsrc.h"
 
 #ifdef CONFIG_PROC_FS
+/**
+ * io_uring_show_cred - Output credentials information to procfs
+ * @m: The seq_file to write output to
+ * @id: The personality ID of the credentials
+ * @cred: The credentials structure to display
+ *
+ * Outputs detailed credential information for a given io_uring personality,
+ * including UIDs, GIDs, supplementary groups, and effective capabilities.
+ * Used for debugging and inspection of io_uring contexts through procfs.
+ *
+ * Return: 0 on success
+ */
 static __cold int io_uring_show_cred(struct seq_file *m, unsigned int id,
 		const struct cred *cred)
 {
@@ -47,6 +59,15 @@ static __cold int io_uring_show_cred(struct seq_file *m, unsigned int id,
 }
 
 #ifdef CONFIG_NET_RX_BUSY_POLL
+/**
+ * common_tracking_show_fdinfo - Display common NAPI tracking information
+ * @ctx: The io_uring context
+ * @m: The seq_file to write output to
+ * @tracking_strategy: String describing the tracking strategy (dynamic/static)
+ *
+ * Outputs common NAPI tracking information to procfs for both dynamic and static
+ * tracking modes. Includes busy polling delta time and preference settings.
+ */
 static __cold void common_tracking_show_fdinfo(struct io_ring_ctx *ctx,
 					       struct seq_file *m,
 					       const char *tracking_strategy)
@@ -60,6 +81,15 @@ static __cold void common_tracking_show_fdinfo(struct io_ring_ctx *ctx,
 		seq_puts(m, "napi_prefer_busy_poll:\tfalse\n");
 }
 
+/**
+ * napi_show_fdinfo - Display NAPI tracking information in procfs
+ * @ctx: The io_uring context
+ * @m: The seq_file to write output to
+ *
+ * Outputs the current NAPI tracking mode and configuration of an io_uring context
+ * to procfs. Shows whether tracking is disabled, dynamic, or static, and includes
+ * relevant configuration parameters for the active mode.
+ */
 static __cold void napi_show_fdinfo(struct io_ring_ctx *ctx,
 				    struct seq_file *m)
 {
@@ -89,6 +119,27 @@ static inline void napi_show_fdinfo(struct io_ring_ctx *ctx,
 /*
  * Caller holds a reference to the file already, we don't need to do
  * anything else to get an extra reference.
+ */
+/**
+ * io_uring_show_fdinfo - Display detailed io_uring instance information in procfs
+ * @m: The seq_file to write output to
+ * @file: The file representing the io_uring instance
+ *
+ * This function provides comprehensive debugging information about an io_uring instance
+ * for the /proc/PID/fdinfo interface. It displays:
+ *   - Submission queue (SQ) and completion queue (CQ) state and parameters
+ *   - Currently pending SQ entries with detailed operation information
+ *   - Completed but not yet consumed CQ entries
+ *   - SQ polling thread status and statistics (when enabled)
+ *   - Registered user files and buffers
+ *   - Personality credentials
+ *   - Active poll requests
+ *   - CQ overflow entries
+ *   - NAPI tracking configuration (when available)
+ *
+ * The function takes care to avoid deadlocks when accessing data structures that
+ * might be modified concurrently by using mutex_trylock() for the uring_lock.
+ * If the lock acquisition fails, it skips displaying information that requires the lock.
  */
 __cold void io_uring_show_fdinfo(struct seq_file *m, struct file *file)
 {
@@ -123,11 +174,11 @@ __cold void io_uring_show_fdinfo(struct seq_file *m, struct file *file)
 	seq_printf(m, "SqMask:\t0x%x\n", sq_mask);
 	seq_printf(m, "SqHead:\t%u\n", sq_head);
 	seq_printf(m, "SqTail:\t%u\n", sq_tail);
-	seq_printf(m, "CachedSqHead:\t%u\n", ctx->cached_sq_head);
+	seq_printf(m, "CachedSqHead:\t%u\n", data_race(ctx->cached_sq_head));
 	seq_printf(m, "CqMask:\t0x%x\n", cq_mask);
 	seq_printf(m, "CqHead:\t%u\n", cq_head);
 	seq_printf(m, "CqTail:\t%u\n", cq_tail);
-	seq_printf(m, "CachedCqTail:\t%u\n", ctx->cached_cq_tail);
+	seq_printf(m, "CachedCqTail:\t%u\n", data_race(ctx->cached_cq_tail));
 	seq_printf(m, "SQEs:\t%u\n", sq_tail - sq_head);
 	sq_entries = min(sq_tail - sq_head, ctx->sq_entries);
 	for (i = 0; i < sq_entries; i++) {
@@ -263,3 +314,4 @@ __cold void io_uring_show_fdinfo(struct seq_file *m, struct file *file)
 	napi_show_fdinfo(ctx, m);
 }
 #endif
+

@@ -16,6 +16,12 @@ bool io_alloc_cache_init(struct io_alloc_cache *cache,
 
 void *io_cache_alloc_new(struct io_alloc_cache *cache, gfp_t gfp);
 
+/*
+ * function to add an entry back into the cache
+ * returns false if the cache is full or kasan_mempool_poison_object
+ * fails
+ * returns true if the entry was added to the cache
+ */
 static inline bool io_alloc_cache_put(struct io_alloc_cache *cache,
 				      void *entry)
 {
@@ -28,6 +34,11 @@ static inline bool io_alloc_cache_put(struct io_alloc_cache *cache,
 	return false;
 }
 
+/*
+ * function to retrieve an entry from the cache
+ * returns NULL if the cache is empty
+ * returns a pointer to the entry if it was found
+ */
 static inline void *io_alloc_cache_get(struct io_alloc_cache *cache)
 {
 	if (cache->nr_cached) {
@@ -49,6 +60,12 @@ static inline void *io_alloc_cache_get(struct io_alloc_cache *cache)
 	return NULL;
 }
 
+/*
+ * function to allocate an entry from the cache
+ * if the cache is empty, it will allocate a new entry
+ * and return it
+ * returns a pointer to the entry
+ */
 static inline void *io_cache_alloc(struct io_alloc_cache *cache, gfp_t gfp)
 {
 	void *obj;
@@ -59,6 +76,11 @@ static inline void *io_cache_alloc(struct io_alloc_cache *cache, gfp_t gfp)
 	return io_cache_alloc_new(cache, gfp);
 }
 
+/*
+ * function to free an object back to the cache
+ * if the cache is full, it will free the object
+ * and return NULL
+ */
 static inline void io_cache_free(struct io_alloc_cache *cache, void *obj)
 {
 	if (!io_alloc_cache_put(cache, obj))
@@ -66,3 +88,4 @@ static inline void io_cache_free(struct io_alloc_cache *cache, void *obj)
 }
 
 #endif
+

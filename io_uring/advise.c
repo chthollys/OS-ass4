@@ -14,6 +14,9 @@
 #include "io_uring.h"
 #include "advise.h"
 
+/*
+ * holds parameters for the fadvise command
+ */
 struct io_fadvise {
 	struct file			*file;
 	u64				offset;
@@ -21,6 +24,9 @@ struct io_fadvise {
 	u32				advice;
 };
 
+/*
+ * holds parameters for the madvise command
+ */
 struct io_madvise {
 	struct file			*file;
 	u64				addr;
@@ -28,6 +34,12 @@ struct io_madvise {
 	u32				advice;
 };
 
+
+/*
+ * prepares an madvise request
+ * only available if certain kernel config options are enabled
+ * and the address space is valid
+ */
 int io_madvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 #if defined(CONFIG_ADVISE_SYSCALLS) && defined(CONFIG_MMU)
@@ -48,6 +60,11 @@ int io_madvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 #endif
 }
 
+/*
+ * executes a previously prepared madvise request
+ * do_madvise() function is called to perform the actual operation
+ * and the result is set in the request
+ */
 int io_madvise(struct io_kiocb *req, unsigned int issue_flags)
 {
 #if defined(CONFIG_ADVISE_SYSCALLS) && defined(CONFIG_MMU)
@@ -64,6 +81,10 @@ int io_madvise(struct io_kiocb *req, unsigned int issue_flags)
 #endif
 }
 
+/*
+ * detemines if the fadvise request should be forced to async
+ * based on the advice parameter
+ */
 static bool io_fadvise_force_async(struct io_fadvise *fa)
 {
 	switch (fa->advice) {
@@ -76,6 +97,9 @@ static bool io_fadvise_force_async(struct io_fadvise *fa)
 	}
 }
 
+/*
+ * prepares an fadvise request
+ */
 int io_fadvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_fadvise *fa = io_kiocb_to_cmd(req, struct io_fadvise);
@@ -93,6 +117,11 @@ int io_fadvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/*
+ * executes a previously prepared fadvise request
+ * vfs_fadvise() function is called to perform the actual operation
+ * and the result is set in the request
+ */
 int io_fadvise(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_fadvise *fa = io_kiocb_to_cmd(req, struct io_fadvise);

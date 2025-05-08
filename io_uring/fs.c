@@ -15,6 +15,15 @@
 #include "io_uring.h"
 #include "fs.h"
 
+/** 
+ * io_rename - carries context for rename operations
+ * @file: optional associated file pointer
+ * @old_dfd: old directory file descriptor
+ * @new_dfd: new directory file descriptor
+ * @oldpath: old path name
+ * @newpath: new path name
+ * @flags: rename flags
+ */
 struct io_rename {
 	struct file			*file;
 	int				old_dfd;
@@ -24,6 +33,13 @@ struct io_rename {
 	int				flags;
 };
 
+/** 
+ * io_unlink - carries context for unlink operations
+ * @file: optional associated file pointer
+ * @dfd: directory file descriptor
+ * @flags: unlink flags
+ * @filename: target filename to unlink
+ */
 struct io_unlink {
 	struct file			*file;
 	int				dfd;
@@ -31,6 +47,13 @@ struct io_unlink {
 	struct filename			*filename;
 };
 
+/**
+ * io_mkdir - carries context for mkdir operations
+ * @file: optional associated file pointer
+ * @dfd: directory file descriptor
+ * @mode: permissions mode
+ * @filename: name of the new directory
+ */
 struct io_mkdir {
 	struct file			*file;
 	int				dfd;
@@ -38,6 +61,15 @@ struct io_mkdir {
 	struct filename			*filename;
 };
 
+/**
+ * io_link - carries context for link/symlink operations
+ * @file: optional associated file pointer
+ * @old_dfd: old directory file descriptor
+ * @new_dfd: new directory file descriptor
+ * @oldpath: old path name
+ * @newpath: new path name
+ * @flags: link or symlink flags
+ */
 struct io_link {
 	struct file			*file;
 	int				old_dfd;
@@ -47,6 +79,16 @@ struct io_link {
 	int				flags;
 };
 
+/**
+ * io_renameat_prep - prepares the rename operation by reading user inputs
+ * @req: The IO request container
+ * @sqe: The submission queue entry containing rename details
+ *
+ * Parses the old and new file paths, validates arguments, and stores them
+ * in the io_rename structure. Forces async execution since filesystem
+ * operations can block. Returns 0 on success, or a negative error code
+ * if validation fails.
+ */
 int io_renameat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_rename *ren = io_kiocb_to_cmd(req, struct io_rename);
@@ -78,6 +120,14 @@ int io_renameat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_renameat - executes the rename operation and sets results
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued (blocking, etc.)
+ *
+ * Calls do_renameat2 with previously stored paths and flags. If the operation
+ * completes successfully or fails, sets the result. Returns IOU_OK.
+ */
 int io_renameat(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_rename *ren = io_kiocb_to_cmd(req, struct io_rename);
@@ -93,6 +143,12 @@ int io_renameat(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_renameat_cleanup - cleans up resources used in the rename operation
+ * @req: The IO request container
+ *
+ * Releases memory allocated for old and new paths.
+ */
 void io_renameat_cleanup(struct io_kiocb *req)
 {
 	struct io_rename *ren = io_kiocb_to_cmd(req, struct io_rename);
@@ -101,6 +157,15 @@ void io_renameat_cleanup(struct io_kiocb *req)
 	putname(ren->newpath);
 }
 
+/**
+ * io_unlinkat_prep - prepares the unlink operation by reading user inputs
+ * @req: The IO request container
+ * @sqe: The submission queue entry indicating whether to unlink a file or rmdir
+ *
+ * Validates arguments and sets up the io_unlink structure with the target path.
+ * Forces async execution to handle potential blocking. Returns 0 on success or
+ * an error code if validation fails.
+ */
 int io_unlinkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_unlink *un = io_kiocb_to_cmd(req, struct io_unlink);
@@ -127,6 +192,15 @@ int io_unlinkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_unlinkat - executes the unlink or rmdir operation
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued (e.g., nonblocking)
+ *
+ * Determines if the operation is a rmdir or unlink based on flags,
+ * then calls the respective function. Sets the result in the request
+ * and returns IOU_OK.
+ */
 int io_unlinkat(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_unlink *un = io_kiocb_to_cmd(req, struct io_unlink);
@@ -144,6 +218,12 @@ int io_unlinkat(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_unlinkat_cleanup - cleans up resources used in the unlink operation
+ * @req: The IO request container
+ *
+ * Frees the allocated filename after the operation completes.
+ */
 void io_unlinkat_cleanup(struct io_kiocb *req)
 {
 	struct io_unlink *ul = io_kiocb_to_cmd(req, struct io_unlink);
@@ -151,6 +231,15 @@ void io_unlinkat_cleanup(struct io_kiocb *req)
 	putname(ul->filename);
 }
 
+/*
+ * io_mkdirat_prep - prepares the mkdir operation by reading user inputs
+ * @req: The IO request container
+ * @sqe: The submission queue entry with mkdir details
+ *
+ * Extracts the directory file descriptor, mode, and the new directory name.
+ * Validates the inputs and sets the request to async. Returns 0 on success,
+ * or a negative error if any parameter is invalid.
+ */
 int io_mkdirat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_mkdir *mkd = io_kiocb_to_cmd(req, struct io_mkdir);
@@ -174,6 +263,14 @@ int io_mkdirat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_mkdirat - executes the mkdir operation
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued
+ *
+ * Calls do_mkdirat to create a directory with the provided mode. If successful
+ * or if an error occurs, the result is stored in the request. Returns IOU_OK.
+ */
 int io_mkdirat(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_mkdir *mkd = io_kiocb_to_cmd(req, struct io_mkdir);
@@ -188,6 +285,12 @@ int io_mkdirat(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_mkdirat_cleanup - cleans up resources used in the mkdir operation
+ * @req: The IO request container
+ *
+ * Releases the filename allocated during preparation.
+ */
 void io_mkdirat_cleanup(struct io_kiocb *req)
 {
 	struct io_mkdir *md = io_kiocb_to_cmd(req, struct io_mkdir);
@@ -195,6 +298,14 @@ void io_mkdirat_cleanup(struct io_kiocb *req)
 	putname(md->filename);
 }
 
+/**
+ * io_symlinkat_prep - prepares a symlink creation by reading user inputs
+ * @req: The IO request container
+ * @sqe: The submission queue entry containing symlink info
+ *
+ * Extracts old and new path pointers for the symlink. Verifies arguments and
+ * sets up async execution. Returns 0 on success or a negative error.
+ */
 int io_symlinkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_link *sl = io_kiocb_to_cmd(req, struct io_link);
@@ -224,6 +335,14 @@ int io_symlinkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_symlinkat - creates a symlink using the prepared context
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued
+ *
+ * Calls do_symlinkat with the oldpath, new directory fd, and newpath.
+ * On completion, sets the result in the request and returns IOU_OK.
+ */
 int io_symlinkat(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_link *sl = io_kiocb_to_cmd(req, struct io_link);
@@ -238,6 +357,15 @@ int io_symlinkat(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_linkat_prep - prepares a hardlink creation by reading user inputs
+ * @req: The IO request container
+ * @sqe: The submission queue entry containing hardlink details
+ *
+ * Stores the old and new directory descriptors, link flags, and file paths
+ * in io_link. Marks the request as needing async cleanup. Returns 0 on success
+ * or an error code on invalid arguments.
+ */
 int io_linkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_link *lnk = io_kiocb_to_cmd(req, struct io_link);
@@ -269,6 +397,14 @@ int io_linkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_linkat - executes the creation of a hardlink
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued
+ *
+ * Relies on do_linkat to process the link creation. Updates the result in the
+ * request upon success or failure. Returns IOU_OK.
+ */
 int io_linkat(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_link *lnk = io_kiocb_to_cmd(req, struct io_link);
@@ -284,6 +420,12 @@ int io_linkat(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_link_cleanup - cleans up resources used in link or symlink operations
+ * @req: The IO request container
+ *
+ * Frees the old and new paths after the link or symlink operation completes.
+ */
 void io_link_cleanup(struct io_kiocb *req)
 {
 	struct io_link *sl = io_kiocb_to_cmd(req, struct io_link);
@@ -291,3 +433,4 @@ void io_link_cleanup(struct io_kiocb *req)
 	putname(sl->oldpath);
 	putname(sl->newpath);
 }
+

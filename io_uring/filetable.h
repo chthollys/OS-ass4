@@ -6,6 +6,33 @@
 #include <linux/io_uring_types.h>
 #include "rsrc.h"
 
+/**
+ * This module implements a file table for io_uring, which manages pre-registered files.
+ * Pre-registered files are files that have been registered with io_uring and can be
+ * referenced directly using their index in future operations, avoiding the need for
+ * repetitive file lookups during I/O operations.
+ *
+ * The file table consists of:
+ * - A bitmap to track used/free file slots
+ * - A range of available file slots (file_alloc_start to file_alloc_end)
+ * - Resources for file references with associated flags
+ *
+ * The flags stored with file pointers (FFS_NOWAIT, FFS_ISREG) provide optimization
+ * information that allows io_uring to make decisions without reexamining the file
+ * properties on each operation.
+ */
+
+/**
+ * struct io_file_table - Maintains the state of registered files
+ * @bitmap: Bitmap indicating which slots are in use
+ * @files: Array of resource nodes containing file pointers and flags
+ * @alloc_hint: Position hint for the next allocation search
+ *
+ * This structure tracks pre-registered files that can be referenced by index
+ * in io_uring operations, enabling faster access without repeated permission checks
+ * or file lookups.
+ */
+
 bool io_alloc_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table, unsigned nr_files);
 void io_free_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table);
 
@@ -34,6 +61,12 @@ static inline void io_file_bitmap_set(struct io_file_table *table, int bit)
 	table->alloc_hint = bit + 1;
 }
 
+/**
+ * File flag bits stored in the node->file_ptr's upper bits
+ * @FFS_NOWAIT: Indicates file operations support non-blocking mode (NOWAIT)
+ * @FFS_ISREG: Indicates the file is a regular file (supports optimized operations)
+ * @FFS_MASK: Mask to extract the file pointer from node->file_ptr
+ */
 #define FFS_NOWAIT		0x1UL
 #define FFS_ISREG		0x2UL
 #define FFS_MASK		~(FFS_NOWAIT|FFS_ISREG)
@@ -49,6 +82,17 @@ static inline struct file *io_slot_file(struct io_rsrc_node *node)
 	return (struct file *)(node->file_ptr & FFS_MASK);
 }
 
+/**
+ * io_fixed_file_set() - Store a file pointer with associated capability flags
+ * @node: Resource node where the file reference will be stored
+ * @file: File pointer to store
+ *
+ * Stores both the file pointer and its capability flags in the resource node.
+ * The capability flags (NOWAIT, ISREG) are extracted from the file and packed
+ * into the high bits of the file_ptr field, allowing io_uring to make quick
+ * decisions about how to handle I/O for this file without re-examining its
+ * properties on each operation.
+ */
 static inline void io_fixed_file_set(struct io_rsrc_node *node,
 				     struct file *file)
 {
@@ -65,3 +109,4 @@ static inline void io_file_table_set_alloc_range(struct io_ring_ctx *ctx,
 }
 
 #endif
+

@@ -12,6 +12,17 @@
 #include "io_uring.h"
 #include "epoll.h"
 
+/**
+ * struct io_epoll - Represents an epoll control operation for io_uring
+ * @file: Pointer to the file structure
+ * @epfd: File descriptor of the epoll instance
+ * @op: Operation to perform (EPOLL_CTL_ADD, EPOLL_CTL_MOD, EPOLL_CTL_DEL)
+ * @fd: Target file descriptor to be added/modified/deleted from the epoll instance
+ * @event: The epoll_event structure containing event data and file descriptor info
+ *
+ * This structure encapsulates the parameters needed for epoll control operations
+ * when submitted through the io_uring interface.
+ */
 struct io_epoll {
 	struct file			*file;
 	int				epfd;
@@ -20,12 +31,31 @@ struct io_epoll {
 	struct epoll_event		event;
 };
 
+/**
+ * struct io_epoll_wait - Represents an epoll wait operation for io_uring
+ * @file: Pointer to the file structure
+ * @maxevents: Maximum number of events to retrieve
+ * @events: User space pointer to an array of epoll_event structures where events will be stored
+ *
+ * This structure holds the parameters for an epoll_wait operation
+ * when submitted through the io_uring interface.
+ */
 struct io_epoll_wait {
 	struct file			*file;
 	int				maxevents;
 	struct epoll_event __user	*events;
 };
 
+/**
+ * io_epoll_ctl_prep - Prepares an epoll control request for io_uring
+ * @req: The IO request being prepared
+ * @sqe: Submission queue entry containing the request parameters
+ *
+ * Initializes the io_epoll structure based on data from the submission queue entry.
+ * Extracts epoll control operation parameters from the SQE and validates them.
+ *
+ * Return: 0 on success, negative error code on failure
+ */
 int io_epoll_ctl_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_epoll *epoll = io_kiocb_to_cmd(req, struct io_epoll);
@@ -49,9 +79,16 @@ int io_epoll_ctl_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 }
 
 /**
-* prepare io_epoll reference, then start the eventpoll in non-blocking mode according
-* to the value passed on io_kiocdb
-*/
+ * io_epoll_ctl - Performs an epoll control operation through io_uring
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued
+ *
+ * Executes an epoll control operation (add, modify, remove) on the specified 
+ * epoll instance. Handles the nonblocking case when requested.
+ *
+ * Return: IOU_OK on completion (success or failure), -EAGAIN if would block
+ *         in nonblocking mode
+ */
 int io_epoll_ctl(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_epoll *ie = io_kiocb_to_cmd(req, struct io_epoll);
@@ -68,6 +105,16 @@ int io_epoll_ctl(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_epoll_wait_prep - Prepares an epoll wait request for io_uring
+ * @req: The IO request being prepared
+ * @sqe: Submission queue entry containing the request parameters
+ *
+ * Initializes the io_epoll_wait structure based on data from the submission
+ * queue entry. Extracts and validates parameters needed for the epoll wait operation.
+ *
+ * Return: 0 on success, negative error code on failure
+ */
 int io_epoll_wait_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_epoll_wait *iew = io_kiocb_to_cmd(req, struct io_epoll_wait);
@@ -80,6 +127,17 @@ int io_epoll_wait_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_epoll_wait - Performs an epoll wait operation through io_uring
+ * @req: The IO request to execute
+ * @issue_flags: Flags controlling how the request is issued
+ *
+ * Executes the epoll wait operation to retrieve ready events from an epoll instance.
+ * Unlike traditional epoll_wait, this is always non-blocking and returns -EAGAIN
+ * when no events are ready.
+ *
+ * Return: IOU_OK on completion (with events or error), -EAGAIN if no events ready
+ */
 int io_epoll_wait(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_epoll_wait *iew = io_kiocb_to_cmd(req, struct io_epoll_wait);
@@ -94,3 +152,4 @@ int io_epoll_wait(struct io_kiocb *req, unsigned int issue_flags)
 	io_req_set_res(req, ret, 0);
 	return IOU_OK;
 }
+

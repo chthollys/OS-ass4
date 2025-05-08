@@ -2,6 +2,13 @@
 
 #include "alloc_cache.h"
 
+
+/*
+ * frees all entries currently in the cache
+ * and then frees the cache itself
+ * it iterates over the entries and calls the free function
+ * on each entry
+ */
 void io_alloc_cache_free(struct io_alloc_cache *cache,
 			 void (*free)(const void *))
 {
@@ -18,6 +25,12 @@ void io_alloc_cache_free(struct io_alloc_cache *cache,
 }
 
 /* returns false if the cache was initialized properly */
+/*
+ * initializes the cache with the given parameters
+ * max_nr: maximum number of entries in the cache
+ * size: size of each entry
+ * init_bytes: number of bytes to initialize
+ */
 bool io_alloc_cache_init(struct io_alloc_cache *cache,
 			 unsigned max_nr, unsigned int size,
 			 unsigned int init_bytes)
@@ -33,6 +46,10 @@ bool io_alloc_cache_init(struct io_alloc_cache *cache,
 	return false;
 }
 
+/*
+ * allocates a new object when the cache is empty
+ * and returns a pointer to it
+ */
 void *io_cache_alloc_new(struct io_alloc_cache *cache, gfp_t gfp)
 {
 	void *obj;
@@ -42,3 +59,4 @@ void *io_cache_alloc_new(struct io_alloc_cache *cache, gfp_t gfp)
 		memset(obj, 0, cache->init_clear);
 	return obj;
 }
+
