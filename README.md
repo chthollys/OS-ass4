@@ -22,12 +22,12 @@
 |           |        |
 |                |               |
 |                        |               |
-| register.c             | register.h           |
-| rsrc.c                 | rsrc.h               |
-| rw.c                   | rw.h                 |
-|                        | slist.h              |
-| splice.c               | splice.h             |
-| sqpoll.c (Fadlin)      | sqpoll.h (Fadlin)    |
+|              |          |
+|              |              |
+|                  |                 |
+|                        |             |
+|          |            |
+|  (Fadlin)      | (Fadlin)    |
 | statx.c                | statx.h              |
 | sync.c                 | sync.h               |
 | tctx.c                 | tctx.h               |
