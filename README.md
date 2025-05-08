@@ -9,10 +9,6 @@
 | filetable.c            | filetable.h          |
 | fs.c                   | fs.h                 |
 | futex.c (Ajam)         | futex.h (Ajam)       |
-| io_uring.c             | io_uring.h           |
-| io-wq.c                | io-wq.h              |
-| kbuf.c                 | kbuf.h               |
-| memmap.c               | memmap.h             |
 | msg_ring.c             | msg_ring.h           |
 | napi.c                 | napi.h               |
 | net.c                  | net.h                |
