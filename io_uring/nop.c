@@ -22,6 +22,7 @@ struct io_nop {
 #define NOP_FLAGS	(IORING_NOP_INJECT_RESULT | IORING_NOP_FIXED_FILE | \
 			 IORING_NOP_FIXED_BUFFER | IORING_NOP_FILE)
 
+/* Prepares a NOP (no operation) request. */
 int io_nop_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_nop *nop = io_kiocb_to_cmd(req, struct io_nop);
@@ -43,6 +44,7 @@ int io_nop_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/* Executes a NOP (no operation) request. */
 int io_nop(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_nop *nop = io_kiocb_to_cmd(req, struct io_nop);
