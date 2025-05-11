@@ -396,185 +396,176 @@
 | io_fixed_install | openclose.c | file, uint | io_install_fixed_fd_prep | openclose.c | return value |
 | | | | io_install_fixed_fd | openclose.c | return value |
 | io_poll_update | poll.c | file, u64, u64, __poll_t, bool, bool | io_kiocb_to_cmd | poll.c | function parameter,return value |
-| io_poll_table | poll.c | poll_table_struct, io_kiocb, int, int, bool, __poll_t | __io_queue_proc | poll.c | function parameter,local variable,return value |
-| | | | io_poll_can_finish_inline | poll.c | function parameter,local variable,return value |
-| | | | __io_arm_poll_handler | poll.c | function parameter,local variable,return value |
-| | | | io_arm_poll_handler | poll.c | function parameter,local variable,return value |
-| io_ring_ctx_rings | register.c | io_rings, io_uring_sqe, io_mapped_region, io_mapped_region | io_register_free_rings | register.c | local variable,return value |
-| | | | io_register_resize_rings | register.c | local variable,return value |
-| io_rsrc_update | rsrc.c | file, u64, u32, u32 | io_kiocb_to_cmd | rsrc.c | function parameter,return value |
-| io_rw | rw.c | kiocb, u64, u32, rwf_t | io_alloc_cache_free | io_uring.c | function parameter |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_complete_rw_iopoll | rw.c | function parameter,return value |
-| | | | io_iov_compat_buffer_select_prep | rw.c | function parameter,return value |
-| | | | io_kiocb_to_cmd | rw.c | function parameter,return value |
-| | | | io_rw_recycle | rw.c | function parameter,return value |
-| | | | io_rw_alloc_async | rw.c | function parameter,return value |
-| | | | io_prep_rw_pi | rw.c | function parameter,return value |
-| | | | io_rw_should_reissue | rw.c | function parameter,return value |
-| | | | io_rw_done | rw.c | function parameter,return value |
-| | | | loop_rw_iter | rw.c | function parameter,return value |
-| | | | io_rw_should_retry | rw.c | function parameter,return value |
-| | | | io_iter_do_read | rw.c | function parameter,return value |
-| | | | io_rw_init_file | rw.c | function parameter,return value |
-| | | | io_rw_fail | rw.c | function parameter,return value |
-| | | | io_rw_cache_free | rw.c | function parameter,return value |
-| | | | io_rw_fail | rw.h | struct reference |
-| | | | io_rw_cache_free | rw.h | struct reference |
-| io_splice | splice.c | file, loff_t, loff_t, u64, int, uint, io_rsrc_node | io_eopnotsupp_prep | opdef.c | return value |
-| | | | __io_splice_prep | splice.c | return value |
-| | | | io_kiocb_to_cmd | splice.c | function parameter,return value |
-| | | | io_splice_cleanup | splice.c | return value |
-| | | | io_splice_get_file | splice.c | return value |
-| | | | io_splice_prep | splice.c | return value |
-| | | | io_splice | splice.c | return value |
-| | | | io_splice_cleanup | splice.h | struct reference |
-| | | | io_splice_prep | splice.h | struct reference |
-| | | | io_splice | splice.h | struct reference |
-| io_statx | statx.c | file, int, uint, uint, filename, statx | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_statx_prep | statx.c | return value |
-| | | | io_kiocb_to_cmd | statx.c | function parameter,return value |
-| | | | io_statx | statx.c | return value |
-| | | | io_statx_cleanup | statx.c | return value |
-| | | | io_statx_prep | statx.h | struct reference |
-| | | | io_statx | statx.h | struct reference |
-| | | | io_statx_cleanup | statx.h | struct reference |
-| io_sync | sync.c | file, loff_t, loff_t, int, int | __io_sync_cancel | cancel.c | return value |
-| | | | io_sync_cancel | cancel.c | return value |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_sync_cancel | register.c | return value |
-| | | | io_kiocb_to_cmd | sync.c | function parameter,return value |
-| | | | io_sync_file_range | sync.c | return value |
-| | | | io_sync_cancel | cancel.h | struct reference |
-| | | | io_sync_file_range | sync.h | struct reference |
-| io_timeout | timeout.c | file, u32, u32, u32, list_head, io_kiocb, io_kiocb | io_timeout_cancel | cancel.c | return value |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_kiocb_to_cmd | timeout.c | function parameter,return value |
-| | | | io_timeout_finish | timeout.c | function parameter,return value |
-| | | | io_timeout_fn | timeout.c | function parameter,return value |
-| | | | io_timeout_complete | timeout.c | function parameter,return value |
-| | | | io_flush_timeouts | timeout.c | function parameter,return value |
-| | | | io_req_set_res | timeout.c | function parameter,return value |
-| | | | io_timeout_extract | timeout.c | function parameter,return value |
-| | | | io_timeout_cancel | timeout.c | function parameter,return value |
-| | | | io_timeout_get_clock | timeout.c | function parameter,return value |
-| | | | io_timeout_update | timeout.c | function parameter,return value |
-| | | | io_timeout_remove_prep | timeout.c | function parameter,return value |
-| | | | io_timeout_remove | timeout.c | function parameter,return value |
-| | | | __io_timeout_prep | timeout.c | function parameter,return value |
-| | | | io_timeout_prep | timeout.c | function parameter,return value |
-| | | | io_timeout | timeout.c | function parameter,return value |
-| | | | io_kill_timeouts | timeout.c | function parameter,return value |
-| | | | io_timeout_cancel | timeout.h | struct reference |
-| | | | io_timeout_prep | timeout.h | struct reference |
-| | | | io_timeout | timeout.h | struct reference |
-| | | | io_timeout_remove_prep | timeout.h | struct reference |
-| | | | io_timeout_remove | timeout.h | struct reference |
-| io_timeout_rem | timeout.c | file, u64, timespec64, u32, bool | io_timeout_update | timeout.c | struct reference |
-| | | | io_timeout_remove_prep | timeout.c | struct reference |
-| | | | io_translate_timeout_mode | timeout.c | struct reference |
-| | | | io_timeout_remove | timeout.c | struct reference |
-| io_ftrunc | truncate.c | file, loff_t | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_ftruncate_prep | truncate.c | return value |
-| | | | io_kiocb_to_cmd | truncate.c | function parameter,return value |
-| | | | io_ftruncate | truncate.c | return value |
-| | | | io_ftruncate_prep | truncate.h | struct reference |
-| | | | io_ftruncate | truncate.h | struct reference |
-| io_waitid | waitid.c | file, int, pid_t, int, atomic_t, wait_queue_head, siginfo, waitid_info | io_waitid_cancel | cancel.c | return value |
-| | | | io_waitid_remove_all | io_uring.c | struct reference |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_waitid_cb | waitid.c | function parameter,return value |
-| | | | io_waitid_free | waitid.c | function parameter,return value |
-| | | | io_waitid_compat_copy_si | waitid.c | function parameter,return value |
-| | | | io_waitid_copy_si | waitid.c | function parameter,return value |
-| | | | io_kiocb_to_cmd | waitid.c | function parameter,return value |
-| | | | io_waitid_finish | waitid.c | function parameter,return value |
-| | | | io_waitid_complete | waitid.c | function parameter,return value |
-| | | | __io_waitid_cancel | waitid.c | function parameter,return value |
-| | | | io_waitid_cancel | waitid.c | function parameter,return value |
-| | | | io_waitid_remove_all | waitid.c | function parameter,return value |
-| | | | io_waitid_drop_issue_ref | waitid.c | function parameter,return value |
-| | | | io_waitid_wait | waitid.c | function parameter,return value |
-| | | | io_waitid_prep | waitid.c | function parameter,return value |
-| | | | io_waitid | waitid.c | function parameter,return value |
-| | | | io_waitid_prep | waitid.h | struct reference |
-| | | | io_waitid | waitid.h | struct reference |
-| | | | io_waitid_cancel | waitid.h | struct reference |
-| | | | io_waitid_remove_all | waitid.h | struct reference |
-| io_xattr | xattr.c | file, kernel_xattr_ctx, filename | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_xattr_cleanup | xattr.c | return value |
-| | | | io_kiocb_to_cmd | xattr.c | function parameter,return value |
-| | | | io_xattr_finish | xattr.c | return value |
-| | | | io_xattr_cleanup | xattr.h | struct reference |
-| io_cancel_data | cancel.h | io_ring_ctx, u64, file, u8, u32, int | io_cancel_req_match | cancel.c | function parameter,local variable,return value |
-| | | | io_async_cancel_one | cancel.c | function parameter,local variable,return value |
-| | | | io_try_cancel | cancel.c | function parameter,local variable,return value |
-| | | | __io_async_cancel | cancel.c | function parameter,local variable,return value |
-| | | | io_kiocb_to_cmd | cancel.c | function parameter,local variable,return value |
-| | | | __io_sync_cancel | cancel.c | function parameter,local variable,return value |
-| | | | io_futex_cancel | futex.c | function parameter,return value |
-| | | | __io_poll_cancel | poll.c | function parameter,local variable,return value |
-| | | | io_poll_cancel | poll.c | function parameter,local variable,return value |
-| | | | io_kiocb_to_cmd | poll.c | function parameter,local variable,return value |
-| | | | io_timeout_cancel | timeout.c | function parameter,local variable,return value |
-| | | | io_waitid_cancel | waitid.c | function parameter,return value |
-| | | | io_try_cancel | cancel.h | function parameter,return value |
-| | | | io_cancel_req_match | cancel.h | function parameter,return value |
-| | | | io_futex_cancel | futex.h | function parameter,return value |
-| | | | io_poll_remove | poll.h | function parameter,return value |
-| | | | io_poll_cancel | poll.h | function parameter,return value |
-| | | | io_flush_timeouts | timeout.h | function parameter,return value |
-| | | | io_timeout_cancel | timeout.h | function parameter,return value |
-| | | | io_waitid_cancel | waitid.h | function parameter,return value |
-| io_wait_queue | io_uring.h | wait_queue_entry, io_ring_ctx, unsigned, unsigned, unsigned, int, ktime_t, ktime_t, hrtimer, ktime_t, bool | io_cqring_schedule_timeout | io_uring.c | function parameter,local variable,return value |
-| | | | __io_cqring_wait_schedule | io_uring.c | function parameter,local variable,return value |
-| | | | io_cqring_wait_schedule | io_uring.c | function parameter,local variable,return value |
-| | | | io_cqring_wait | io_uring.c | function parameter,local variable,return value |
-| | | | io_napi_busy_loop_should_end | napi.c | function parameter,return value |
-| | | | io_napi_blocking_busy_loop | napi.c | function parameter,return value |
-| | | | __io_napi_busy_loop | napi.c | function parameter,return value |
-| | | | io_should_wake | io_uring.h | function parameter,return value |
-| | | | __io_napi_busy_loop | napi.h | function parameter,return value |
-| | | | io_napi_busy_loop | napi.h | function parameter,return value |
-| io_wq_hash | io-wq.h | refcount_t, unsigned, wait_queue_head | io_wq_hash_work | io-wq.c | return value |
-| | | | io_wq_hash_wake | io-wq.c | return value |
-| | | | io_wq_put_hash | io-wq.h | function parameter,return value |
-| | | | io_wq_hash_work | io-wq.h | function parameter,return value |
-| io_wq_data | io-wq.h | io_wq_hash, task_struct, io_wq_work_fn, free_work_fn | io_wq_create | io-wq.c | function parameter,return value |
-| | | | io_wq_create | io-wq.h | function parameter,return value |
-| io_buffer_list | kbuf.h | list_head, io_uring_buf_ring, __u16, __u16, __u16, __u16, __u16, __u16, io_mapped_region | io_buffer_get_list | kbuf.c | function parameter,return value |
-| | | | io_buffer_add_list | kbuf.c | function parameter,return value |
-| | | | io_kbuf_recycle_legacy | kbuf.c | function parameter,return value |
-| | | | io_provided_buffers_select | kbuf.c | function parameter,return value |
-| | | | io_ring_buffers_peek | kbuf.c | function parameter,return value |
-| | | | io_buffers_select | kbuf.c | function parameter,return value |
-| | | | io_buffers_peek | kbuf.c | function parameter,return value |
-| | | | __io_remove_buffers | kbuf.c | function parameter,return value |
-| | | | io_put_bl | kbuf.c | function parameter,return value |
-| | | | io_destroy_buffers | kbuf.c | function parameter,return value |
-| | | | io_destroy_bl | kbuf.c | function parameter,return value |
-| | | | io_kiocb_to_cmd | kbuf.c | function parameter,return value |
-| | | | io_add_buffers | kbuf.c | function parameter,return value |
-| | | | io_register_pbuf_ring | kbuf.c | function parameter,return value |
-| | | | io_unregister_pbuf_ring | kbuf.c | function parameter,return value |
-| | | | io_register_pbuf_status | kbuf.c | function parameter,return value |
-| | | | io_kbuf_commit | kbuf.h | return value |
-| | | | __io_put_kbuf_ring | kbuf.h | return value |
-| io_buffer | kbuf.h | list_head, __u64, __u32, __u16, __u16 | __io_put_kbuf | kbuf.c | return value |
-| | | | __io_put_kbuf_list | kbuf.c | function parameter,return value |
-| | | | io_buffer_select | kbuf.c | return value |
-| | | | io_refill_buffer_cache | kbuf.c | return value |
-| | | | io_buffers_select | net.c | return value |
-| | | | io_buffer_select | net.c | return value |
-| | | | io_buffers_peek | net.c | return value |
-| | | | io_buffer_validate | rsrc.c | return value |
-| | | | io_buffer_unmap | rsrc.c | return value |
-| | | | io_buffer_account_pin | rsrc.c | return value |
-| | | | io_buffer_select | rw.c | return value |
-| | | | io_buffer_select | kbuf.h | struct reference |
-| | | | io_buffers_select | kbuf.h | struct reference |
-| | | | io_buffers_peek | kbuf.h | struct reference |
-| | | | __io_put_kbuf_list | kbuf.h | function parameter |
+| io_poll_table | poll.c | poll_table_struct, io_kiocb, int, int, bool, __poll_t | __io_queue_proc   | poll.c |  function parameter |
+| | | | io_poll_queue_proc | poll.c | Local variable |
+| | | | io_poll_can_finish_inline | poll.c | function parameter |
+| | | | __io_arm_poll_handler | poll.c | function parameter |
+| | | | io_async_queue_proc | poll.c | Local variable |
+| | | | io_arm_poll_handler | poll.c | Local variable |
+| | | | io_poll_add | poll.c | Local variable |
+| io_ring_ctx_rings | register.c | io_rings, io_uring_sqe, io_mapped_region, io_mapped_region | io_register_free_rings | register.c | function parameter |
+| | | | io_register_resize_rings | register.c | Local variable |
+| io_rsrc_update | rsrc.c | file, u64, u32, u32 | io_files_update_prep | rsrc.c | Local variable |
+| | | | io_files_update_with_index_alloc | rsrc.c | Local variable |
+| | | | io_files_update | rsrc.c | Local variable |
+| io_rw | rw.c | kiocb, u64, u32, rwf_t | io_iov_compat_buffer_select_prep | rw.c | function parameter |
+| | | | io_iov_buffer_select_prep | rw.c | Local variable |
+| | | | __io_import_rw_buffer | rw.c | Local variable |
+| | | | io_prep_rw_pi | rw.c | function parameter |
+| | | | __io_prep_rw | rw.c | Local variable |
+| | | | io_init_rw_fixed | rw.c | Local variable |
+| | | | io_rw_import_reg_vec | rw.c | Local variable |
+| | | | io_rw_prep_reg_vec | rw.c | Local variable |
+| | | | io_read_mshot_prep | rw.c | Local variable |
+| | | | io_kiocb_update_pos | rw.c | Local variable |
+| | | | io_rw_should_reissue | rw.c | Local variable |
+| | | | io_req_end_write | rw.c | Local variable |
+| | | | io_req_io_end | rw.c | Local variable |
+| | | | io_req_rw_complete | rw.c | Local variable|
+| | | | io_complete_rw | rw.c | Local variable |
+| | | | io_complete_rw_iopoll | rw.c | Local variable |
+| | | | io_rw_done | rw.c | Local variable |
+| | | | kiocb_done | rw.c | Local variable |
+| | | | loop_rw_iter | rw.c | function parameter |
+| | | | io_async_buf_func | rw.c | Local variable |
+| | | | io_rw_should_retry | rw.c | Local variable |
+| | | | io_iter_do_read | rw.c | function parameter |
+| | | | io_rw_init_file | rw.c | Local variable |
+| | | | __io_read | rw.c | Local variable |
+| | | | io_read_mshot | rw.c | Local variable |
+| | | | io_write | rw.c | Local variable |
+| | | | io_uring_classic_poll | rw.c | Local variable |
+| io_splice | splice.c | file, loff_t, loff_t, u64, int, uint, io_rsrc_node | __io_splice_prep | splice.c | Local variable |
+| | | | io_splice_cleanup | splice.c | Local variable |
+| | | | io_splice_get_file | splice.c | Local variable |
+| | | | io_tee | splice.c | Local variable |
+| | | | io_splice_prep | splice.c | Local variable |
+| | | | io_splice | splice.c | Local variable |
+| io_statx | statx.c | file, int, uint, uint, filename, statx | io_statx_prep | statx.c | Local variable |
+| | | | io_statx | statx.c | Local variable |
+| | | | io_statx_cleanup | statx.c | Local variable |
+| io_sync | sync.c | file, loff_t, loff_t, int, int | io_sfr_prep | sync.c | Local variable |
+| | | | io_sync_file_range | sync.c | Local variable |
+| | | | io_fsync_prep | sync.c | Local variable |
+| | | | io_fsync | sync.c | Local variable |
+| | | | io_fallocate_prep | sync.c | Local variable |
+| | | | io_fallocate | sync.c | Local variable |
+| io_timeout | timeout.c | file, u32, u32, u32, list_head, io_kiocb, io_kiocb | io_is_timeout_noseq | timeout.c | Local variable |
+| | | | io_timeout_finish | timeout.c | function parameter |
+| | | | io_timeout_complete | timeout.c | Local variable |
+| | | | io_flush_killed_timeouts | timeout.c | Local variable |
+| | | | io_kill_timeout | timeout.c | Local variable |
+| | | | io_flush_timeouts | timeout.c | Local variable |
+| | | | __io_disarm_linked_timeout | timeout.c | Local variable |
+| | | | io_timeout_fn | timeout.c | Local variable |
+| | | | io_timeout_extract | timeout.c | Local variable |
+| | | | io_req_task_link_timeout | timeout.c | Local variable |
+| | | | io_link_timeout_fn | timeout.c | Local variable |
+| | | | io_linked_timeout_update | timeout.c | Local variable |
+| | | | io_timeout_update | timeout.c | Local variable |
+| | | | __io_timeout_prep | timeout.c | Local variable |
+| | | | io_timeout | timeout.c | Local variable |
+| | | | io_queue_linked_timeout | timeout.c | Local variable |
+| | | | io_kill_timeouts | timeout.c | Local variable |
+| io_timeout_rem | timeout.c | file, u64, timespec64, u32, bool | io_timeout_remove_prep | timeout.c | Local variable |
+| | | | io_timeout_remove | timeout.c | Local variable |
+| io_ftrunc | truncate.c | file, loff_t | io_ftruncate_prep | truncate.c | Local variable |
+| | | | io_ftruncate | truncate.c | Local variable |
+| io_waitid | waitid.c | file, int, pid_t, int, atomic_t, wait_queue_head, siginfo, waitid_info | io_waitid_compat_copy_si | waitid.c | function parameter |
+| | | | io_waitid_copy_si | waitid.c | Local variable |
+| | | | io_waitid_complete | waitid.c | Local variable |
+| | | | __io_waitid_cancel | waitid.c | Local variable |
+| | | | io_waitid_drop_issue_ref | waitid.c | Local variable |
+| | | | io_waitid_cb | waitid.c | Local variable |
+| | | | io_waitid_prep | waitid.c | Local variable |
+| | | | io_waitid_wait | waitid.c | Local variable |
+| | | | io_waitid_prep | waitid.c | Local variable |
+| | | | io_waitid | waitid.c | Local variable |
+| io_xattr | xattr.c | file, kernel_xattr_ctx, filename | io_xattr_cleanup | xattr.c | Local variable |
+| | | | __io_getxattr_prep | xattr.c | Local variable |
+| | | | io_getxattr_prep | xattr.c | Local variable |
+| | | | io_fgetxattr | xattr.c | Local variable |
+| | | | io_getxattr | xattr.c | Local variable |
+| | | | __io_setxattr_prep | xattr.c | Local variable |
+| | | | io_setxattr_prep | xattr.c | Local variable |
+| | | | io_fsetxattr | xattr.c | Local variable |
+| | | | io_setxattr | xattr.c | Local variable |
+| io_zcrx_args | zcrx.c | io_kiocb, io_zcrx_ifq, socket, unsigned | io_zcrx_recv_skb | zcrx.c | Local variable |
+| | | | io_zcrx_tcp_recvmsg | zcrx.c | Local variable |
+| io_cancel_data | cancel.h | io_ring_ctx, u64, file, u8, u32, int | io_try_cancel| cancel.h |function parameter |
+| | | | io_cancel_req_match | cancel.h | function parameter|
+| | | | io_cancel_remove | cancel.h | function parameter |
+| | | | io_cancel_req_match | cancel.c | function parameter |
+| | | | io_cancel_cb | cancel.c | Local variable |
+| | | | io_async_cancel_one | cancel.c | function parameter |
+| | | | io_try_cancel | cancel.c | function parameter |
+| | | | __io_async_cancel | cancel.c | function parameter |
+| | | | io_async_cancel | cancel.c | function parameter |
+| | | | __io_sync_cancel | cancel.c | function parameter |
+| | | | io_sync_cancel | cancel.c | Local variable |
+| | | | io_cancel_remove | cancel.c | function parameter |
+| | | | io_futex_cancel | futex.c | function parameter |
+| | | | io_futex_cancel | futex.h | function parameter |
+| | | | io_poll_find | poll.c | function parameter |
+| | | | io_poll_file_find | poll.c | function parameter |
+| | | | __io_poll_cancel | poll.c | function parameter |
+| | | | io_poll_cancel | poll.c | function parameter |
+| | | | io_poll_remove | poll.c | Local variable |
+| | | | io_timeout_extract | timeout.c | function parameter |
+| | | | io_timeout_cancel | timeout.c | function parameter |
+| | | | io_req_task_link_timeout | timeout.c | Local variable |
+| | | | io_timeout_update | timeout.c | Local variable |
+| | | | io_timeout_remove | timeout.c | Local variable |
+| | | | io_timeout_cancel | timeout.h | function parameter |
+| | | | io_waitid_cancel | waitid.c | function parameter |
+| | | | io_waitid_cancel | waitid.h | function parameter |
+| io_wait_queue | io_uring.h | wait_queue_entry, io_ring_ctx, unsigned, unsigned, unsigned, int, ktime_t, ktime_t, hrtimer, ktime_t, bool | io_should_wake | io_uring.h | function parameter |
+| | | | io_wake_function | io_uring.c | Local variable |
+| | | | io_cqring_timer_wakeup | io_uring.c | Local variable |
+| | | | io_cqring_min_timer_wakeup | io_uring.c | Local variable |
+| | | | io_cqring_schedule_timeout | io_uring.c | function parameter |
+| | | | __io_cqring_wait_schedule | io_uring.c | function parameter |
+| | | | io_cqring_wait_schedule | io_uring.c | function parameter |
+| | | | io_cqring_wait | io_uring.c | Local variable |
+| | | | io_napi_busy_loop_should_end | napi.c | Local variable |
+| | | | io_napi_blocking_busy_loop | napi.c | function parameter |
+| | | | __io_napi_busy_loop | napi.c | function parameter |
+| | | | __io_napi_busy_loop | napi.h | function parameter |
+| | | | io_napi_busy_loop | napi.h | function parameter |
+| | | | io_napi_busy_loop | napi.h | function parameter |
+| io_wq_hash | io-wq.h | refcount_t, unsigned, wait_queue_head | io_wq_put_hash | io-wq.h | function parameter |
+| | | | io_init_wq_offload | txtc.c | Local variable |
+| io_wq_data | io-wq.h | io_wq_hash, task_struct, io_wq_work_fn, free_work_fn |io_wq_create | io-wq.c |  function parameter|
+| | | | io_init_wq_offload | txtc.c | Local variable |
+| io_buffer_list | kbuf.h | list_head, io_uring_buf_ring, __u16, __u16, __u16, __u16, __u16, __u16, io_mapped_region | io_kbuf_commit | kbuf.h | function parameter|
+| | | | io_kbuf_inc_commit | kbuf.c | function parameter |
+| | | | io_kbuf_commit | kbuf.c | function parameter |
+| | | | io_buffer_get_list | kbuf.c | Return values |
+| | | | io_buffer_add_list | kbuf.c | function parameter |
+| | | | io_kbuf_recycle_legacy | kbuf.c | Local variable |
+| | | | io_provided_buffer_select | kbuf.c | function parameter |
+| | | | io_provided_buffers_select | kbuf.c | function parameter |
+| | | | io_ring_buffer_select | kbuf.c | function parameter |
+| | | | io_buffer_select | kbuf.c | Local variable |
+| | | | io_ring_buffers_peek | kbuf.c |function parameter|
+| | | | io_buffers_select | kbuf.c | Local variable |
+| | | | io_buffers_peek | kbuf.c | Local variable |
+| | | | __io_put_kbuf_ring | kbuf.c | Local variable |
+| | | | __io_remove_buffers | kbuf.c | function parameter |
+| | | | io_put_bl | kbuf.c | function parameter |
+| | | | io_destroy_buffers | kbuf.c | Local variable |
+| | | | io_destroy_bl | kbuf.c | function parameter |
+| | | | io_remove_buffers | kbuf.c | Local variable |
+| | | | io_add_buffers | kbuf.c | function parameter |
+| | | | io_provide_buffers | kbuf.c | Local variable |
+| | | | io_register_pbuf_ring | kbuf.c | Local variable |
+| | | | io_unregister_pbuf_ring | kbuf.c | Local variable |
+| | | | io_register_pbuf_status | kbuf.c | Local variable |
+| | | | io_pbuf_get_region | kbuf.c | Local variable |
+| io_buffer | kbuf.h | list_head, __u64, __u32, __u16, __u16 | io_kbuf_recycle_legacy| kbuf.c | Local variable|
+| | | | io_provided_buffer_select | kbuf.c | Local variable |
+| | | | __io_remove_buffers | kbuf.c | Local variable |
+| | | | io_add_buffers | kbuf.c | Local variable |
 | buf_sel_arg | kbuf.h | iovec, size_t, size_t, unsigned, unsigned | io_kiocb_to_cmd | net.c | local variable |
 | io_async_msghdr | net.h | iovec, int, int, iovec, __kernel_size_t, __kernel_size_t, sockaddr, msghdr, sockaddr_storage | io_netmsg_iovec_free | net.c | function parameter,return value |
 | | | | io_netmsg_recycle | net.c | function parameter,return value |
