@@ -11,6 +11,7 @@
 
 static const struct ubuf_info_ops io_ubuf_ops;
 
+/* Completes notification processing in task_work context. */
 static void io_notif_tw_complete(struct io_kiocb *notif, io_tw_token_t tw)
 {
 	struct io_notif_data *nd = io_notif_to_data(notif);
@@ -33,6 +34,7 @@ static void io_notif_tw_complete(struct io_kiocb *notif, io_tw_token_t tw)
 	} while (nd);
 }
 
+/* Handles completion of a transmitted user buffer (ubuf). */
 void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
 			 bool success)
 {
@@ -60,6 +62,7 @@ void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
 	__io_req_task_work_add(notif, tw_flags);
 }
 
+/* Links an sk_buff to a ubuf_info for zero-copy tracking. */
 static int io_link_skb(struct sk_buff *skb, struct ubuf_info *uarg)
 {
 	struct io_notif_data *nd, *prev_nd;
@@ -104,6 +107,7 @@ static const struct ubuf_info_ops io_ubuf_ops = {
 	.link_skb = io_link_skb,
 };
 
+/* Allocates and initializes a notification request. */
 struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
 	__must_hold(&ctx->uring_lock)
 {
