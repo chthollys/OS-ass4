@@ -12,18 +12,6 @@
 #include "alloc_cache.h"
 #include "futex.h"
 
-/**
- * struct io_futex - Represents a futex operation in io_uring.
- * @file: Associated file structure.
- * @uaddr: User-space address for the futex.
- * @uwaitv: User-space futex wait vector.
- * @futex_val: Value to compare or operate on.
- * @futex_mask: Mask to apply to the futex value.
- * @futexv_owned: Tracks ownership of futex vector operations.
- * @futex_flags: Flags for futex operations.
- * @futex_nr: Number of futexes in a vector operation.
- * @futexv_unqueued: Indicates whether futex vector operations are unqueued.
- */
 struct io_futex {
 	struct file	*file;
 	union {
@@ -38,11 +26,6 @@ struct io_futex {
 	bool		futexv_unqueued;
 };
 
-/**
- * struct io_futex_data - Represents futex data for async operations.
- * @q: Futex queue structure.
- * @req: Associated io_kiocb request.
- */
 struct io_futex_data {
 	struct futex_q	q;
 	struct io_kiocb	*req;
@@ -50,11 +33,9 @@ struct io_futex_data {
 
 #define IO_FUTEX_ALLOC_CACHE_MAX	32
 
-/**
- * io_futex_cache_init - Initializes the futex cache for io_uring.
- * @ctx: Pointer to the io_ring_ctx structure.
- *
- * Returns: True if the cache was successfully initialized, false otherwise.
+/*
+ * initialize the futex cache for io_uring. 
+ * ensures efficient allocation and reuse of futex data structures.
  */
 bool io_futex_cache_init(struct io_ring_ctx *ctx)
 {
@@ -62,19 +43,18 @@ bool io_futex_cache_init(struct io_ring_ctx *ctx)
 				sizeof(struct io_futex_data), 0);
 }
 
-/**
- * io_futex_cache_free - Frees the futex cache for io_uring.
- * @ctx: Pointer to the io_ring_ctx structure.
+/*
+ * free the futex cache for io_uring. 
+ * releases all allocated resources associated with the cache.
  */
 void io_futex_cache_free(struct io_ring_ctx *ctx)
 {
 	io_alloc_cache_free(&ctx->futex_cache, kfree);
 }
 
-/**
- * __io_futex_complete - Completes a futex operation.
- * @req: Pointer to the io_kiocb request.
- * @tw: Token for task work.
+/*
+ * complete a futex operation. 
+ * cleans up resources and marks the request as finished.
  */
 static void __io_futex_complete(struct io_kiocb *req, io_tw_token_t tw)
 {
@@ -83,10 +63,9 @@ static void __io_futex_complete(struct io_kiocb *req, io_tw_token_t tw)
 	io_req_task_complete(req, tw);
 }
 
-/**
- * io_futex_complete - Completes a futex operation and frees resources.
- * @req: Pointer to the io_kiocb request.
- * @tw: Token for task work.
+/*
+ * complete a futex operation and free associated resources. 
+ * ensures proper cleanup and task completion.
  */
 static void io_futex_complete(struct io_kiocb *req, io_tw_token_t tw)
 {
@@ -97,10 +76,9 @@ static void io_futex_complete(struct io_kiocb *req, io_tw_token_t tw)
 	__io_futex_complete(req, tw);
 }
 
-/**
- * io_futexv_complete - Completes a futex vector operation.
- * @req: Pointer to the io_kiocb request.
- * @tw: Token for task work.
+/*
+ * complete a futex vector operation. 
+ * handles unqueued operations and releases allocated memory.
  */
 static void io_futexv_complete(struct io_kiocb *req, io_tw_token_t tw)
 {
@@ -122,11 +100,9 @@ static void io_futexv_complete(struct io_kiocb *req, io_tw_token_t tw)
 	__io_futex_complete(req, tw);
 }
 
-/**
- * io_futexv_claim - Claims ownership of a futex vector operation.
- * @iof: Pointer to the io_futex structure.
- *
- * Returns: True if ownership was successfully claimed, false otherwise.
+/*
+ * claim ownership of a futex vector operation. 
+ * ensures that only one thread can operate on the vector at a time.
  */
 static bool io_futexv_claim(struct io_futex *iof)
 {
@@ -136,11 +112,9 @@ static bool io_futexv_claim(struct io_futex *iof)
 	return true;
 }
 
-/**
- * __io_futex_cancel - Cancels a futex operation.
- * @req: Pointer to the io_kiocb request.
- *
- * Returns: True if the operation was successfully canceled, false otherwise.
+/*
+ * cancel a futex operation. 
+ * removes the operation from the queue and marks it as canceled.
  */
 static bool __io_futex_cancel(struct io_kiocb *req)
 {
@@ -165,13 +139,9 @@ static bool __io_futex_cancel(struct io_kiocb *req)
 	return true;
 }
 
-/**
- * io_futex_cancel - Cancels a futex operation in io_uring.
- * @ctx: Pointer to the io_ring_ctx structure.
- * @cd: Pointer to the io_cancel_data structure.
- * @issue_flags: Flags for the cancellation operation.
- *
- * Returns: 0 on success, or a negative error code on failure.
+/*
+ * cancel a futex operation in io_uring. 
+ * removes the operation from the context's futex list.
  */
 int io_futex_cancel(struct io_ring_ctx *ctx, struct io_cancel_data *cd,
 		    unsigned int issue_flags)
@@ -179,13 +149,9 @@ int io_futex_cancel(struct io_ring_ctx *ctx, struct io_cancel_data *cd,
 	return io_cancel_remove(ctx, cd, issue_flags, &ctx->futex_list, __io_futex_cancel);
 }
 
-/**
- * io_futex_remove_all - Removes all futex operations for a task.
- * @ctx: Pointer to the io_ring_ctx structure.
- * @tctx: Pointer to the io_uring_task structure.
- * @cancel_all: Whether to cancel all operations.
- *
- * Returns: True if operations were removed, false otherwise.
+/*
+ * remove all futex operations for a task. 
+ * optionally cancels all operations if specified.
  */
 bool io_futex_remove_all(struct io_ring_ctx *ctx, struct io_uring_task *tctx,
 			 bool cancel_all)
@@ -193,12 +159,9 @@ bool io_futex_remove_all(struct io_ring_ctx *ctx, struct io_uring_task *tctx,
 	return io_cancel_remove_all(ctx, tctx, &ctx->futex_list, cancel_all, __io_futex_cancel);
 }
 
-/**
- * io_futex_prep - Prepares a futex operation.
- * @req: Pointer to the io_kiocb request.
- * @sqe: Pointer to the io_uring_sqe structure.
- *
- * Returns: 0 on success, or a negative error code on failure.
+/*
+ * prepare a futex operation. 
+ * validates input parameters and initializes the futex structure.
  */
 int io_futex_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -228,10 +191,9 @@ int io_futex_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
-/**
- * io_futex_wakev_fn - Wake function for futex vector operations.
- * @wake_q: Pointer to the wake queue head.
- * @q: Pointer to the futex queue.
+/*
+ * wake function for futex vector operations. 
+ * handles wakeup events and schedules task work for completion.
  */
 static void io_futex_wakev_fn(struct wake_q_head *wake_q, struct futex_q *q)
 {
@@ -248,12 +210,9 @@ static void io_futex_wakev_fn(struct wake_q_head *wake_q, struct futex_q *q)
 	io_req_task_work_add(req);
 }
 
-/**
- * io_futexv_prep - Prepares a futex vector operation.
- * @req: Pointer to the io_kiocb request.
- * @sqe: Pointer to the io_uring_sqe structure.
- *
- * Returns: 0 on success, or a negative error code on failure.
+/*
+ * prepare a futex vector operation. 
+ * parses the wait vector and allocates necessary resources.
  */
 int io_futexv_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -289,10 +248,9 @@ int io_futexv_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
-/**
- * io_futex_wake_fn - Wake function for futex operations.
- * @wake_q: Pointer to the wake queue head.
- * @q: Pointer to the futex queue.
+/*
+ * wake function for futex operations. 
+ * processes wakeup events and schedules task work for completion.
  */
 static void io_futex_wake_fn(struct wake_q_head *wake_q, struct futex_q *q)
 {
@@ -307,12 +265,9 @@ static void io_futex_wake_fn(struct wake_q_head *wake_q, struct futex_q *q)
 	io_req_task_work_add(req);
 }
 
-/**
- * io_futexv_wait - Waits on a futex vector operation.
- * @req: Pointer to the io_kiocb request.
- * @issue_flags: Flags for the wait operation.
- *
- * Returns: IOU_ISSUE_SKIP_COMPLETE on success, or IOU_OK on failure.
+/*
+ * wait on a futex vector operation. 
+ * sets up the waiters and handles wakeup scenarios.
  */
 int io_futexv_wait(struct io_kiocb *req, unsigned int issue_flags)
 {
@@ -369,12 +324,9 @@ int io_futexv_wait(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_ISSUE_SKIP_COMPLETE;
 }
 
-/**
- * io_futex_wait - Waits on a futex operation.
- * @req: Pointer to the io_kiocb request.
- * @issue_flags: Flags for the wait operation.
- *
- * Returns: IOU_ISSUE_SKIP_COMPLETE on success, or IOU_OK on failure.
+/*
+ * wait on a futex operation. 
+ * queues the operation and handles setup errors.
  */
 int io_futex_wait(struct io_kiocb *req, unsigned int issue_flags)
 {
@@ -422,12 +374,9 @@ done:
 	return IOU_OK;
 }
 
-/**
- * io_futex_wake - Wakes up a futex operation.
- * @req: Pointer to the io_kiocb request.
- * @issue_flags: Flags for the wake operation.
- *
- * Returns: IOU_OK.
+/*
+ * wake up a futex operation. 
+ * ensures proper handling of strict flags and wakeup results.
  */
 int io_futex_wake(struct io_kiocb *req, unsigned int issue_flags)
 {

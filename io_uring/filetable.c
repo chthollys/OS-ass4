@@ -13,15 +13,10 @@
 #include "rsrc.h"
 #include "filetable.h"
 
-/**
- * io_file_bitmap_get - Find an available slot in the file table bitmap
- * @ctx: Pointer to the io_uring context
- *
- * Searches for a free slot in the file table bitmap starting from the allocation hint.
- * If it reaches the end without finding one, wraps around to the beginning of the
- * allowed allocation range.
- *
- * Return: Index of the free slot if found, -ENFILE if no free slots available
+/*
+ * find an available slot in the file table bitmap starting from the allocation hint.
+ * wraps around to the beginning of the allowed allocation range if no free slot is found.
+ * returns the index of the free slot or -ENFILE if no slots are available.
  */
 static int io_file_bitmap_get(struct io_ring_ctx *ctx)
 {
@@ -46,16 +41,9 @@ static int io_file_bitmap_get(struct io_ring_ctx *ctx)
 	return -ENFILE;
 }
 
-/**
- * io_alloc_file_tables - Allocate file tables for an io_uring context
- * @ctx: Pointer to the io_uring context
- * @table: Pointer to the file table structure to initialize
- * @nr_files: Number of file slots to allocate
- *
- * Allocates the resource data array and bitmap needed to track fixed files.
- * The bitmap is used to track which slots are in use.
- *
- * Return: true on successful allocation, false on failure
+/*
+ * allocate file tables for an io_uring context, including the resource data array
+ * and bitmap used to track fixed files. returns true on success, false on failure.
  */
 bool io_alloc_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table,
 			  unsigned nr_files)
@@ -69,13 +57,9 @@ bool io_alloc_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table,
 	return false;
 }
 
-/**
- * io_free_file_tables - Free resources used by file tables
- * @ctx: Pointer to the io_uring context
- * @table: Pointer to the file table structure to free
- *
- * Releases all memory allocated for the file tables, including the resource
- * data array and bitmap.
+/*
+ * free resources used by file tables, including the resource data array
+ * and bitmap. ensures all allocated memory is released.
  */
 void io_free_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table)
 {
@@ -84,16 +68,10 @@ void io_free_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table)
 	table->bitmap = NULL;
 }
 
-/**
- * io_install_fixed_file - Install a file in a specified slot in the fixed file table
- * @ctx: Pointer to the io_uring context
- * @file: Pointer to the file to install
- * @slot_index: Index where the file should be installed
- *
- * Installs a file in the specified slot of the fixed file table. Rejects io_uring
- * files to prevent reference cycles. The uring_lock must be held when calling this function.
- *
- * Return: 0 on success, negative error code on failure
+/*
+ * install a file in a specified slot in the fixed file table. rejects io_uring
+ * files to prevent reference cycles. the uring_lock must be held when calling.
+ * returns 0 on success or a negative error code on failure.
  */
 static int io_install_fixed_file(struct io_ring_ctx *ctx, struct file *file,
 				 u32 slot_index)
@@ -120,17 +98,10 @@ static int io_install_fixed_file(struct io_ring_ctx *ctx, struct file *file,
 	return 0;
 }
 
-/**
- * __io_fixed_fd_install - Install a file in the fixed file table
- * @ctx: Pointer to the io_uring context
- * @file: Pointer to the file to install
- * @file_slot: Requested slot index or IORING_FILE_INDEX_ALLOC for automatic allocation
- *
- * Core implementation of fixed file installation that handles both user-specified
- * slots and automatic slot allocation. Adjusts the slot index as needed before
- * calling io_install_fixed_file().
- *
- * Return: Allocated slot number on success, negative error code on failure
+/*
+ * install a file in the fixed file table, handling both user-specified slots
+ * and automatic slot allocation. adjusts the slot index as needed before installation.
+ * returns the allocated slot number or a negative error code on failure.
  */
 int __io_fixed_fd_install(struct io_ring_ctx *ctx, struct file *file,
 			  unsigned int file_slot)
@@ -157,17 +128,10 @@ int __io_fixed_fd_install(struct io_ring_ctx *ctx, struct file *file,
  * fput() is called correspondingly.
  */
 
-/**
- * io_fixed_fd_install - Install a file in the fixed file table with locking
- * @req: Pointer to the io_kiocb request
- * @issue_flags: Submission flags
- * @file: Pointer to the file to install
- * @file_slot: Requested slot index or IORING_FILE_INDEX_ALLOC for automatic allocation
- *
- * Wrapper for __io_fixed_fd_install that handles locking and ensures file
- * reference counts are properly managed on error.
- *
- * Return: Allocated slot number on success, negative error code on failure
+/*
+ * install a file in the fixed file table with locking. ensures proper
+ * management of file reference counts on error. returns the allocated
+ * slot number or a negative error code on failure.
  */
 int io_fixed_fd_install(struct io_kiocb *req, unsigned int issue_flags,
 			struct file *file, unsigned int file_slot)
@@ -184,15 +148,10 @@ int io_fixed_fd_install(struct io_kiocb *req, unsigned int issue_flags,
 	return ret;
 }
 
-/**
- * io_fixed_fd_remove - Remove a file from the fixed file table
- * @ctx: Pointer to the io_uring context
- * @offset: Slot index of the file to remove
- *
- * Removes a file from the specified slot in the fixed file table.
- * The file reference is released through io_reset_rsrc_node().
- *
- * Return: 0 on success, negative error code on failure
+/*
+ * remove a file from the fixed file table at the specified slot index.
+ * releases the file reference through io_reset_rsrc_node. returns 0 on
+ * success or a negative error code on failure.
  */
 int io_fixed_fd_remove(struct io_ring_ctx *ctx, unsigned int offset)
 {
@@ -211,15 +170,10 @@ int io_fixed_fd_remove(struct io_ring_ctx *ctx, unsigned int offset)
 	return 0;
 }
 
-/**
- * io_register_file_alloc_range - Register a range for file slot allocations
- * @ctx: Pointer to the io_uring context
- * @arg: User-provided structure specifying the range
- *
- * Sets the allowed range for automatically allocating file slots. This restricts
- * automatic allocations to occur only within the specified range.
- *
- * Return: 0 on success, negative error code on failure
+/*
+ * register a range for file slot allocations, restricting automatic
+ * allocations to occur only within the specified range. returns 0 on
+ * success or a negative error code on failure.
  */
 int io_register_file_alloc_range(struct io_ring_ctx *ctx,
 				 struct io_uring_file_index_range __user *arg)

@@ -16,17 +16,10 @@
 #include "rsrc.h"
 
 #ifdef CONFIG_PROC_FS
-/**
- * io_uring_show_cred - Output credentials information to procfs
- * @m: The seq_file to write output to
- * @id: The personality ID of the credentials
- * @cred: The credentials structure to display
- *
- * Outputs detailed credential information for a given io_uring personality,
- * including UIDs, GIDs, supplementary groups, and effective capabilities.
- * Used for debugging and inspection of io_uring contexts through procfs.
- *
- * Return: 0 on success
+
+/*
+ * outputs credential information for a given io_uring personality.
+ * includes UIDs, GIDs, supplementary groups, and effective capabilities.
  */
 static __cold int io_uring_show_cred(struct seq_file *m, unsigned int id,
 		const struct cred *cred)
@@ -59,14 +52,10 @@ static __cold int io_uring_show_cred(struct seq_file *m, unsigned int id,
 }
 
 #ifdef CONFIG_NET_RX_BUSY_POLL
-/**
- * common_tracking_show_fdinfo - Display common NAPI tracking information
- * @ctx: The io_uring context
- * @m: The seq_file to write output to
- * @tracking_strategy: String describing the tracking strategy (dynamic/static)
- *
- * Outputs common NAPI tracking information to procfs for both dynamic and static
- * tracking modes. Includes busy polling delta time and preference settings.
+
+/*
+ * outputs common NAPI tracking information to procfs. includes
+ * busy polling delta time and preference settings for the strategy.
  */
 static __cold void common_tracking_show_fdinfo(struct io_ring_ctx *ctx,
 					       struct seq_file *m,
@@ -81,14 +70,9 @@ static __cold void common_tracking_show_fdinfo(struct io_ring_ctx *ctx,
 		seq_puts(m, "napi_prefer_busy_poll:\tfalse\n");
 }
 
-/**
- * napi_show_fdinfo - Display NAPI tracking information in procfs
- * @ctx: The io_uring context
- * @m: The seq_file to write output to
- *
- * Outputs the current NAPI tracking mode and configuration of an io_uring context
- * to procfs. Shows whether tracking is disabled, dynamic, or static, and includes
- * relevant configuration parameters for the active mode.
+/*
+ * displays the current NAPI tracking mode and configuration. shows
+ * whether tracking is disabled, dynamic, or static, with parameters.
  */
 static __cold void napi_show_fdinfo(struct io_ring_ctx *ctx,
 				    struct seq_file *m)
@@ -117,29 +101,9 @@ static inline void napi_show_fdinfo(struct io_ring_ctx *ctx,
 #endif
 
 /*
- * Caller holds a reference to the file already, we don't need to do
- * anything else to get an extra reference.
- */
-/**
- * io_uring_show_fdinfo - Display detailed io_uring instance information in procfs
- * @m: The seq_file to write output to
- * @file: The file representing the io_uring instance
- *
- * This function provides comprehensive debugging information about an io_uring instance
- * for the /proc/PID/fdinfo interface. It displays:
- *   - Submission queue (SQ) and completion queue (CQ) state and parameters
- *   - Currently pending SQ entries with detailed operation information
- *   - Completed but not yet consumed CQ entries
- *   - SQ polling thread status and statistics (when enabled)
- *   - Registered user files and buffers
- *   - Personality credentials
- *   - Active poll requests
- *   - CQ overflow entries
- *   - NAPI tracking configuration (when available)
- *
- * The function takes care to avoid deadlocks when accessing data structures that
- * might be modified concurrently by using mutex_trylock() for the uring_lock.
- * If the lock acquisition fails, it skips displaying information that requires the lock.
+ * provides detailed debugging information about an io_uring instance.
+ * outputs submission/completion queue states, registered resources,
+ * and other context-specific details to procfs.
  */
 __cold void io_uring_show_fdinfo(struct seq_file *m, struct file *file)
 {

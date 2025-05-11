@@ -46,15 +46,9 @@ struct io_epoll_wait {
 	struct epoll_event __user	*events;
 };
 
-/**
- * io_epoll_ctl_prep - Prepares an epoll control request for io_uring
- * @req: The IO request being prepared
- * @sqe: Submission queue entry containing the request parameters
- *
- * Initializes the io_epoll structure based on data from the submission queue entry.
- * Extracts epoll control operation parameters from the SQE and validates them.
- *
- * Return: 0 on success, negative error code on failure
+/* prepares an epoll control request for io_uring
+ * initializes the io_epoll structure based on data from the submission queue entry.
+ * validates the parameters for the epoll control operation.
  */
 int io_epoll_ctl_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -78,16 +72,9 @@ int io_epoll_ctl_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
-/**
- * io_epoll_ctl - Performs an epoll control operation through io_uring
- * @req: The IO request to execute
- * @issue_flags: Flags controlling how the request is issued
- *
- * Executes an epoll control operation (add, modify, remove) on the specified 
- * epoll instance. Handles the nonblocking case when requested.
- *
- * Return: IOU_OK on completion (success or failure), -EAGAIN if would block
- *         in nonblocking mode
+/* performs an epoll control operation through io_uring
+ * executes add, modify, or remove operations on the specified epoll instance.
+ * handles nonblocking cases when requested.
  */
 int io_epoll_ctl(struct io_kiocb *req, unsigned int issue_flags)
 {
@@ -105,15 +92,9 @@ int io_epoll_ctl(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
-/**
- * io_epoll_wait_prep - Prepares an epoll wait request for io_uring
- * @req: The IO request being prepared
- * @sqe: Submission queue entry containing the request parameters
- *
- * Initializes the io_epoll_wait structure based on data from the submission
- * queue entry. Extracts and validates parameters needed for the epoll wait operation.
- *
- * Return: 0 on success, negative error code on failure
+/* prepares an epoll wait request for io_uring
+ * initializes the io_epoll_wait structure based on data from the submission queue entry.
+ * validates the parameters for the epoll wait operation.
  */
 int io_epoll_wait_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -127,16 +108,9 @@ int io_epoll_wait_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
-/**
- * io_epoll_wait - Performs an epoll wait operation through io_uring
- * @req: The IO request to execute
- * @issue_flags: Flags controlling how the request is issued
- *
- * Executes the epoll wait operation to retrieve ready events from an epoll instance.
- * Unlike traditional epoll_wait, this is always non-blocking and returns -EAGAIN
- * when no events are ready.
- *
- * Return: IOU_OK on completion (with events or error), -EAGAIN if no events ready
+/* performs an epoll wait operation through io_uring
+ * retrieves ready events from an epoll instance in a non-blocking manner.
+ * returns -EAGAIN if no events are ready.
  */
 int io_epoll_wait(struct io_kiocb *req, unsigned int issue_flags)
 {

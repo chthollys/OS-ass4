@@ -6,33 +6,6 @@
 #include <linux/io_uring_types.h>
 #include "rsrc.h"
 
-/**
- * This module implements a file table for io_uring, which manages pre-registered files.
- * Pre-registered files are files that have been registered with io_uring and can be
- * referenced directly using their index in future operations, avoiding the need for
- * repetitive file lookups during I/O operations.
- *
- * The file table consists of:
- * - A bitmap to track used/free file slots
- * - A range of available file slots (file_alloc_start to file_alloc_end)
- * - Resources for file references with associated flags
- *
- * The flags stored with file pointers (FFS_NOWAIT, FFS_ISREG) provide optimization
- * information that allows io_uring to make decisions without reexamining the file
- * properties on each operation.
- */
-
-/**
- * struct io_file_table - Maintains the state of registered files
- * @bitmap: Bitmap indicating which slots are in use
- * @files: Array of resource nodes containing file pointers and flags
- * @alloc_hint: Position hint for the next allocation search
- *
- * This structure tracks pre-registered files that can be referenced by index
- * in io_uring operations, enabling faster access without repeated permission checks
- * or file lookups.
- */
-
 bool io_alloc_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table, unsigned nr_files);
 void io_free_file_tables(struct io_ring_ctx *ctx, struct io_file_table *table);
 
@@ -47,6 +20,10 @@ int io_register_file_alloc_range(struct io_ring_ctx *ctx,
 
 io_req_flags_t io_file_get_flags(struct file *file);
 
+/*
+ * clears a specific bit in the file table bitmap and updates the allocation hint.
+ * ensures the bit being cleared was previously set.
+ */
 static inline void io_file_bitmap_clear(struct io_file_table *table, int bit)
 {
 	WARN_ON_ONCE(!test_bit(bit, table->bitmap));
@@ -54,6 +31,10 @@ static inline void io_file_bitmap_clear(struct io_file_table *table, int bit)
 	table->alloc_hint = bit;
 }
 
+/*
+ * sets a specific bit in the file table bitmap and updates the allocation hint.
+ * ensures the bit being set was previously cleared.
+ */
 static inline void io_file_bitmap_set(struct io_file_table *table, int bit)
 {
 	WARN_ON_ONCE(test_bit(bit, table->bitmap));
@@ -71,27 +52,27 @@ static inline void io_file_bitmap_set(struct io_file_table *table, int bit)
 #define FFS_ISREG		0x2UL
 #define FFS_MASK		~(FFS_NOWAIT|FFS_ISREG)
 
+/*
+ * extracts capability flags from the resource node's file pointer.
+ * shifts the flags to align with the request flag bit positions.
+ */
 static inline unsigned int io_slot_flags(struct io_rsrc_node *node)
 {
-
 	return (node->file_ptr & ~FFS_MASK) << REQ_F_SUPPORT_NOWAIT_BIT;
 }
 
+/*
+ * retrieves the file pointer from the resource node by masking out flags.
+ * ensures only the actual file pointer is returned.
+ */
 static inline struct file *io_slot_file(struct io_rsrc_node *node)
 {
 	return (struct file *)(node->file_ptr & FFS_MASK);
 }
 
-/**
- * io_fixed_file_set() - Store a file pointer with associated capability flags
- * @node: Resource node where the file reference will be stored
- * @file: File pointer to store
- *
- * Stores both the file pointer and its capability flags in the resource node.
- * The capability flags (NOWAIT, ISREG) are extracted from the file and packed
- * into the high bits of the file_ptr field, allowing io_uring to make quick
- * decisions about how to handle I/O for this file without re-examining its
- * properties on each operation.
+/*
+ * stores a file pointer and its associated capability flags in a resource node.
+ * flags are extracted from the file and packed into the high bits of the file_ptr field.
  */
 static inline void io_fixed_file_set(struct io_rsrc_node *node,
 				     struct file *file)
@@ -100,6 +81,10 @@ static inline void io_fixed_file_set(struct io_rsrc_node *node,
 		(io_file_get_flags(file) >> REQ_F_SUPPORT_NOWAIT_BIT);
 }
 
+/*
+ * sets the allocation range for the file table in the io_ring context.
+ * updates the allocation hint to the start of the specified range.
+ */
 static inline void io_file_table_set_alloc_range(struct io_ring_ctx *ctx,
 						 unsigned off, unsigned len)
 {

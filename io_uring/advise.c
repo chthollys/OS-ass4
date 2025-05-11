@@ -35,10 +35,9 @@ struct io_madvise {
 };
 
 
-/*
- * prepares an madvise request
- * only available if certain kernel config options are enabled
- * and the address space is valid
+/* prepares a madvise request
+ * validates the address space and initializes the io_madvise structure.
+ * ensures the request is forced to asynchronous execution.
  */
 int io_madvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -60,10 +59,9 @@ int io_madvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 #endif
 }
 
-/*
- * executes a previously prepared madvise request
- * do_madvise() function is called to perform the actual operation
- * and the result is set in the request
+/* executes a madvise request
+ * calls do_madvise() to perform the operation and sets the result in the request.
+ * ensures the operation is executed synchronously.
  */
 int io_madvise(struct io_kiocb *req, unsigned int issue_flags)
 {
@@ -81,9 +79,9 @@ int io_madvise(struct io_kiocb *req, unsigned int issue_flags)
 #endif
 }
 
-/*
- * detemines if the fadvise request should be forced to async
- * based on the advice parameter
+/* determines if an fadvise request should be forced to async
+ * checks the advice parameter to decide if asynchronous execution is required.
+ * returns true for advice types that require async execution.
  */
 static bool io_fadvise_force_async(struct io_fadvise *fa)
 {
@@ -97,8 +95,9 @@ static bool io_fadvise_force_async(struct io_fadvise *fa)
 	}
 }
 
-/*
- * prepares an fadvise request
+/* prepares an fadvise request
+ * initializes the io_fadvise structure with parameters from the submission queue entry.
+ * validates the parameters and sets the request to async if necessary.
  */
 int io_fadvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
@@ -117,10 +116,9 @@ int io_fadvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
-/*
- * executes a previously prepared fadvise request
- * vfs_fadvise() function is called to perform the actual operation
- * and the result is set in the request
+/* executes an fadvise request
+ * calls vfs_fadvise() to perform the operation and sets the result in the request.
+ * handles both synchronous and asynchronous execution based on the advice parameter.
  */
 int io_fadvise(struct io_kiocb *req, unsigned int issue_flags)
 {

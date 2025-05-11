@@ -11,18 +11,6 @@
 #include "io-wq.h"
 #include "eventfd.h"
 
-/**
- * struct io_ev_fd - Structure containing eventfd context and state
- * @cq_ev_fd: Pointer to eventfd context for completion queue notifications
- * @eventfd_async: Flag controlling whether notifications should be sent from async context
- * @last_cq_tail: Last observed completion queue tail position (protected by completion_lock)
- * @refs: Reference counter tracking active users of this eventfd
- * @ops: Atomic flags for tracking pending operations on the eventfd
- * @rcu: RCU head for deferred freeing of the structure
- *
- * This structure maintains the state for a registered eventfd notification
- * mechanism used to signal I/O completions in io_uring.
- */
 struct io_ev_fd {
 	struct eventfd_ctx	*cq_ev_fd;
 	unsigned int		eventfd_async;
@@ -33,23 +21,13 @@ struct io_ev_fd {
 	struct rcu_head		rcu;
 };
 
-/**
- * enum io_eventfd_op_bits - Bit flags for tracking eventfd operations
- * @IO_EVENTFD_OP_SIGNAL_BIT: Indicates a pending eventfd signal operation
- *
- * These flags track operations that are in progress on the eventfd.
- */
 enum {
 	IO_EVENTFD_OP_SIGNAL_BIT,
 };
 
-/**
- * io_eventfd_free - Free an io_ev_fd structure after RCU grace period
- * @rcu: RCU head embedded in the io_ev_fd structure being freed
- *
- * This function is called after an RCU grace period to clean up an
- * io_ev_fd structure that's no longer used. It releases the eventfd context
- * and frees the memory allocated for the structure.
+/*
+ * frees an io_ev_fd structure after an RCU grace period. releases the
+ * eventfd context and deallocates the memory used by the structure.
  */
 static void io_eventfd_free(struct rcu_head *rcu)
 {
@@ -59,12 +37,9 @@ static void io_eventfd_free(struct rcu_head *rcu)
 	kfree(ev_fd);
 }
 
-/**
- * io_eventfd_put - Decrease the reference count on an io_ev_fd
- * @ev_fd: The io_ev_fd structure to put
- *
- * Decreases the reference count on the io_ev_fd structure and schedules
- * it for freeing via RCU when the count reaches zero.
+/*
+ * decreases the reference count on an io_ev_fd structure. schedules
+ * it for deferred freeing via RCU when the reference count reaches zero.
  */
 static void io_eventfd_put(struct io_ev_fd *ev_fd)
 {
@@ -72,13 +47,9 @@ static void io_eventfd_put(struct io_ev_fd *ev_fd)
 		call_rcu(&ev_fd->rcu, io_eventfd_free);
 }
 
-/**
- * io_eventfd_do_signal - RCU callback to signal an eventfd
- * @rcu: RCU head embedded in the io_ev_fd structure
- *
- * This function is called after scheduling via call_rcu_hurry to signal
- * the eventfd from a safe context when the original context couldn't directly
- * signal the eventfd.
+/*
+ * signals an eventfd from a safe context using an RCU callback. this
+ * is used when the original context cannot directly signal the eventfd.
  */
 static void io_eventfd_do_signal(struct rcu_head *rcu)
 {
@@ -88,13 +59,9 @@ static void io_eventfd_do_signal(struct rcu_head *rcu)
 	io_eventfd_put(ev_fd);
 }
 
-/**
- * io_eventfd_release - Release an io_ev_fd after it's been used
- * @ev_fd: The io_ev_fd structure to release
- * @put_ref: Whether to also decrease the reference count
- *
- * Releases the RCU read lock and, if requested, also drops a reference
- * to the io_ev_fd structure.
+/*
+ * releases an io_ev_fd structure after use. optionally decreases
+ * the reference count if requested by the caller.
  */
 static void io_eventfd_release(struct io_ev_fd *ev_fd, bool put_ref)
 {
@@ -104,7 +71,8 @@ static void io_eventfd_release(struct io_ev_fd *ev_fd, bool put_ref)
 }
 
 /*
- * Returns true if the caller should put the ev_fd reference, false if not.
+ * signals an eventfd if allowed by the current context. uses an RCU
+ * callback if signaling is not directly possible.
  */
 static bool __io_eventfd_signal(struct io_ev_fd *ev_fd)
 {
@@ -120,8 +88,8 @@ static bool __io_eventfd_signal(struct io_ev_fd *ev_fd)
 }
 
 /*
- * Trigger if eventfd_async isn't set, or if it's set and the caller is
- * an async worker. If ev_fd isn't valid, obviously return false.
+ * determines whether an eventfd should be triggered. checks if the
+ * caller is an async worker or if eventfd_async is not set.
  */
 static bool io_eventfd_trigger(struct io_ev_fd *ev_fd)
 {
@@ -131,8 +99,8 @@ static bool io_eventfd_trigger(struct io_ev_fd *ev_fd)
 }
 
 /*
- * On success, returns with an ev_fd reference grabbed and the RCU read
- * lock held.
+ * grabs a reference to an io_ev_fd structure and holds the RCU read
+ * lock. returns NULL if the eventfd is disabled or unavailable.
  */
 static struct io_ev_fd *io_eventfd_grab(struct io_ring_ctx *ctx)
 {
@@ -161,13 +129,9 @@ static struct io_ev_fd *io_eventfd_grab(struct io_ring_ctx *ctx)
 	return NULL;
 }
 
-/**
- * io_eventfd_signal - Signal an eventfd for an io_uring completion queue
- * @ctx: The io_uring context
- *
- * Signals the eventfd associated with the io_uring context to notify of
- * completion events. This function is called when new completion queue entries
- * are added to the ring buffer.
+/*
+ * signals the eventfd associated with an io_uring context. this
+ * notifies the completion queue of new events being added.
  */
 void io_eventfd_signal(struct io_ring_ctx *ctx)
 {
@@ -178,13 +142,9 @@ void io_eventfd_signal(struct io_ring_ctx *ctx)
 		io_eventfd_release(ev_fd, __io_eventfd_signal(ev_fd));
 }
 
-/**
- * io_eventfd_flush_signal - Signal eventfd only if completion queue has changed
- * @ctx: The io_uring context
- *
- * Like io_eventfd_signal(), but only signals the eventfd if the completion queue
- * tail has changed since the last notification. This helps avoid unnecessary
- * wakeups when no new completions have been added.
+/*
+ * signals the eventfd only if the completion queue tail has changed.
+ * avoids unnecessary wakeups when no new completions are added.
  */
 void io_eventfd_flush_signal(struct io_ring_ctx *ctx)
 {
@@ -215,17 +175,9 @@ void io_eventfd_flush_signal(struct io_ring_ctx *ctx)
 	}
 }
 
-/**
- * io_eventfd_register - Register an eventfd for io_uring completion notifications
- * @ctx: The io_uring context
- * @arg: User space pointer to an eventfd file descriptor
- * @eventfd_async: Flag indicating whether eventfd should be signaled from async context
- *
- * Registers an eventfd that will be signaled when entries are added to the
- * completion queue. The eventfd is identified by a file descriptor passed from
- * user space.
- *
- * Return: 0 on success, negative error code on failure
+/*
+ * registers an eventfd for io_uring completion notifications. the
+ * eventfd is identified by a file descriptor passed from user space.
  */
 int io_eventfd_register(struct io_ring_ctx *ctx, void __user *arg,
 			unsigned int eventfd_async)
@@ -266,13 +218,9 @@ int io_eventfd_register(struct io_ring_ctx *ctx, void __user *arg,
 	return 0;
 }
 
-/**
- * io_eventfd_unregister - Unregister an eventfd from an io_uring context
- * @ctx: The io_uring context
- *
- * Removes a previously registered eventfd from the io_uring context.
- *
- * Return: 0 on success, -ENXIO if no eventfd was registered
+/*
+ * unregisters a previously registered eventfd from an io_uring
+ * context. returns an error if no eventfd was registered.
  */
 int io_eventfd_unregister(struct io_ring_ctx *ctx)
 {
