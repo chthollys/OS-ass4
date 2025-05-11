@@ -12,17 +12,6 @@
 #include "io_uring.h"
 #include "epoll.h"
 
-/**
- * struct io_epoll - Represents an epoll control operation for io_uring
- * @file: Pointer to the file structure
- * @epfd: File descriptor of the epoll instance
- * @op: Operation to perform (EPOLL_CTL_ADD, EPOLL_CTL_MOD, EPOLL_CTL_DEL)
- * @fd: Target file descriptor to be added/modified/deleted from the epoll instance
- * @event: The epoll_event structure containing event data and file descriptor info
- *
- * This structure encapsulates the parameters needed for epoll control operations
- * when submitted through the io_uring interface.
- */
 struct io_epoll {
 	struct file			*file;
 	int				epfd;
@@ -31,15 +20,6 @@ struct io_epoll {
 	struct epoll_event		event;
 };
 
-/**
- * struct io_epoll_wait - Represents an epoll wait operation for io_uring
- * @file: Pointer to the file structure
- * @maxevents: Maximum number of events to retrieve
- * @events: User space pointer to an array of epoll_event structures where events will be stored
- *
- * This structure holds the parameters for an epoll_wait operation
- * when submitted through the io_uring interface.
- */
 struct io_epoll_wait {
 	struct file			*file;
 	int				maxevents;
