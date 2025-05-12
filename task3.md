@@ -171,129 +171,98 @@
 | | | | io_wq_cpu_online | io-wq.c | local variable |
 | | | | io_wq_cpu_offline | io-wq.c | local variable |
 | | | | io_wq_max_workers | io-wq.c | function parameter |
-| io_cb_cancel_data | io-wq.c | work_cancel_fn, void, int, int, bool | create_io_worker | io-wq.c | struct reference |
-| | | | io_wq_dec_running | io-wq.c | struct reference |
-| | | | io_acct_cancel_pending_work | io-wq.c | struct reference |
-| | | | queue_create_worker_retry | io-wq.c | local variable |
-| online_data | io-wq.c | unsigned, bool | io_wq_exit_workers | io-wq.c | struct reference |
+| io_cb_cancel_data | io-wq.c | work_cancel_fn, void, int, int, bool | io_acct_cancel_pending_work | io-wq.c | function parameter |
 | | | | io_wq_destroy | io-wq.c | local variable |
-| | | | io_wq_put_and_exit | io-wq.c | local variable |
-| | | | io_wq_worker_affinity | io-wq.c | local variable |
+| | | | create_worker_cont | io-wq.c | local variable |
+| | | | io_wq_enqueue | io-wq.c | local variable |
+| | | | __io_wq_worker_cancel | io-wq.c | function parameter |
+| | | | io_wq_worker_cancel | io-wq.c | struct reference |
+| | | | io_wq_cancel_pending_work | io-wq.c | function parameter |
+| | | | io_acct_cancel_running_work | io-wq.c | function parameter |
+| | | | io_wq_cancel_running_work | io-wq.c | function parameter |
+| | | | io_wq_cancel_cb | io-wq.c | local variable |
+| | | | io_wq_destroy | io-wq.c | local variable |
+| online_data | io-wq.c | unsigned, bool | io_wq_worker_affinity | io-wq.c | struct reference |
 | | | | __io_wq_cpu_online | io-wq.c | local variable |
-| io_provide_buf | kbuf.c | file, __u64, __u32, __u32, __u32, __u16 | io_kiocb_to_cmd | kbuf.c | function parameter,return value |
-| | | | io_put_bl | kbuf.c | struct reference |
-| | | | io_destroy_buffers | kbuf.c | struct reference |
-| | | | io_destroy_bl | kbuf.c | struct reference |
+| io_provide_buf | kbuf.c | file, __u64, __u32, __u32, __u32, __u16 | io_put_bl | kbuf.c | struct reference |
 | | | | io_remove_buffers_prep | kbuf.c | struct reference |
 | | | | io_remove_buffers | kbuf.c | struct reference |
-| | | | io_provide_buffers_prep | kbuf.c | function parameter,return value |
-| | | | io_refill_buffer_cache | kbuf.c | struct reference |
-| | | | io_add_buffers | kbuf.c | function parameter,return value |
-| | | | io_provide_buffers | kbuf.c | function parameter,return value |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_add_buffers | kbuf.c | function parameter,return value |
-| | | | io_provide_buffers_prep | kbuf.h | struct reference |
-| | | | io_provide_buffers | kbuf.h | struct reference |
-| io_msg | msg_ring.c | file, file, callback_head, u64, u32, u32, u32, u32, u32, u32 | io_msg_ring_cleanup | msg_ring.c | function parameter,local variable,return value |
-| | | | io_kiocb_to_cmd | msg_ring.c | function parameter,local variable,return value |
-| | | | io_double_unlock_ctx | msg_ring.c | struct reference |
-| | | | io_double_lock_ctx | msg_ring.c | struct reference |
-| | | | io_msg_need_remote | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_tw_complete | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_remote_post | msg_ring.c | function parameter,local variable,return value |
-| | | | percpu_ref_get | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_get_kiocb | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_data_remote | msg_ring.c | function parameter,local variable,return value |
-| | | | __io_msg_ring_data | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_ring_data | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_grab_file | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_install_complete | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_tw_fd_complete | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_fd_remote | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_send_fd | msg_ring.c | function parameter,local variable,return value |
-| | | | __io_msg_ring_prep | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_ring_prep | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_ring | msg_ring.c | function parameter,local variable,return value |
-| | | | io_uring_sync_msg_ring | msg_ring.c | function parameter,local variable,return value |
-| | | | io_msg_alloc_async | net.c | return value |
-| | | | io_msg_copy_hdr | net.c | return value |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_msg_ring_prep | msg_ring.h | struct reference |
-| | | | io_msg_ring | msg_ring.h | struct reference |
-| | | | io_msg_ring_cleanup | msg_ring.h | struct reference |
-| io_napi_entry | napi.c | uint, list_head, unsigned, hlist_node, rcu_head | io_napi_hash_find | napi.c | return value |
-| | | | net_to_ktime | napi.c | struct reference |
-| | | | ns_to_ktime | napi.c | struct reference |
-| | | | __io_napi_add_id | napi.c | struct reference |
-| | | | __io_napi_del_id | napi.c | struct reference |
-| | | | __io_napi_remove_stale | napi.c | struct reference |
-| | | | io_napi_remove_stale | napi.c | struct reference |
-| | | | io_napi_busy_loop_timeout | napi.c | struct reference |
-| | | | ktime_after | napi.c | struct reference |
-| | | | io_napi_busy_loop_should_end | napi.c | struct reference |
-| | | | static_tracking_do_busy_loop | napi.c | struct reference |
-| | | | io_napi_init | napi.c | struct reference |
-| | | | io_napi_free | napi.c | struct reference |
-| io_shutdown | net.c | file, int | io_shutdown_prep | net.c | return value |
-| | | | io_kiocb_to_cmd | net.c | function parameter,return value |
-| | | | io_shutdown | net.c | return value |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_shutdown_prep | net.h | struct reference |
-| | | | io_shutdown | net.h | struct reference |
-| io_accept | net.c | file, sockaddr, int, int, int, u32, unsigned | io_accept_prep | net.c | return value |
-| | | | io_accept | net.c | return value |
-| | | | io_accept_prep | net.h | struct reference |
-| | | | io_accept | net.h | struct reference |
-| io_socket | net.c | file, int, int, int, int, u32, unsigned | io_socket_prep | net.c | return value |
-| | | | io_socket | net.c | return value |
-| | | | io_socket_prep | net.h | struct reference |
-| | | | io_socket | net.h | struct reference |
-| io_connect | net.c | file, sockaddr, int, bool, bool | io_connect_prep | net.c | return value |
-| | | | io_connect | net.c | return value |
-| | | | io_connect_prep | net.h | struct reference |
-| | | | io_connect | net.h | struct reference |
-| io_bind | net.c | file, int | io_bind_prep | net.c | return value |
-| | | | io_bind | net.c | return value |
-| | | | io_bind_prep | net.h | struct reference |
-| | | | io_bind | net.h | struct reference |
-| io_listen | net.c | file, int | io_listen_prep | net.c | return value |
-| | | | io_listen | net.c | return value |
-| | | | io_listen_prep | net.h | struct reference |
-| | | | io_listen | net.h | struct reference |
-| io_sr_msg | net.c | file, compat_msghdr, user_msghdr, void, int, unsigned, unsigned, unsigned, u16, u16, u16, void, io_kiocb | io_recvmsg_prep_multishot | net.c | function parameter,return value |
-| | | | io_recvmsg_multishot | net.c | function parameter,return value |
-| io_recvmsg_multishot_hdr | net.c | io_uring_recvmsg_out, sockaddr_storage | | | |
-| io_nop | nop.c | file, int, int, int, uint | io_nop_prep | nop.c | return value |
-| | | | io_kiocb_to_cmd | nop.c | function parameter,return value |
-| | | | io_nop | nop.c | return value |
-| | | | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_nop_prep | nop.h | struct reference |
-| | | | io_nop | nop.h | struct reference |
-| io_open | openclose.c | file, int, u32, filename, open_how, unsigned | io_eopnotsupp_prep | opdef.c | return value |
-| | | | io_openat_force_async | openclose.c | function parameter,return value |
-| | | | __io_openat_prep | openclose.c | function parameter,return value |
-| | | | io_kiocb_to_cmd | openclose.c | function parameter,return value |
-| | | | io_openat_prep | openclose.c | function parameter,return value |
-| | | | io_openat2_prep | openclose.c | function parameter,return value |
-| | | | io_openat2 | openclose.c | function parameter,return value |
-| | | | io_openat | openclose.c | function parameter,return value |
-| | | | io_open_cleanup | openclose.c | function parameter,return value |
+| | | | io_provide_buffers_prep | kbuf.c | struct reference |
+| | | | io_add_buffers | kbuf.c | function parameter |
+| | | | io_provide_buffers | kbuf.c | struct reference |
+| io_msg | msg_ring.c | file, file, callback_head, u64, u32, u32, u32, u32, u32, u32 | io_msg_ring_cleanup | msg_ring.c | struct reference |
+| | | | io_msg_data_remote | msg_ring.c | function parameter |
+| | | | __io_msg_ring_data | msg_ring.c | function parameter |
+| | | | io_msg_ring_data | msg_ring.c | struct reference |
+| | | | io_msg_grab_file | msg_ring.c | struct reference |
+| | | | io_msg_install_complete | msg_ring.c | struct reference |
+| | | | io_msg_tw_fd_complete | msg_ring.c | struct reference |
+| | | | io_msg_fd_remote | msg_ring.c | struct reference |
+| | | | io_msg_send_fd | msg_ring.c | struct reference |
+| | | | __io_msg_ring_prep | msg_ring.c | function parameter |
+| | | | io_msg_ring | msg_ring.c | struct reference |
+| | | | io_uring_sync_msg_ring | msg_ring.c | struct reference |
+| io_napi_entry | napi.c | uint, list_head, unsigned, hlist_node, rcu_head | io_napi_hash_find | napi.c | return type, local variable |
+| | | | __io_napi_add_id | napi.c | local variable |
+| | | | __io_napi_del_id | napi.c | local variable |
+| | | | __io_napi_remove_stale | napi.c | local variable |
+| | | | static_tracking_do_busy_loop | napi.c | local variable |
+| | | | dynamic_tracking_do_busy_loop | napi.c | local variable |
+| | | | io_napi_free | napi.c | local variable |
+| io_shutdown | net.c | file, int | io_shutdown_prep | net.c | struct reference |
+| | | | io_shutdown | net.c | struct reference |
+| io_accept | net.c | file, sockaddr, int, int, int, u32, unsigned | io_accept_prep | net.c | struct reference |
+| | | | io_accept | net.c | struct reference |
+| io_socket | net.c | file, int, int, int, int, u32, unsigned | io_socket_prep | net.c | struct reference |
+| | | | io_socket | net.c | struct reference |
+| io_connect | net.c | file, sockaddr, int, bool, bool | io_connect_prep | net.c | struct reference |
+| | | | io_connect | net.c | struct reference |
+| io_bind | net.c | file, int | io_bind_prep | net.c | struct reference |
+| | | | io_bind | net.c | struct reference |
+| io_listen | net.c | file, int | io_listen_prep | net.c | struct reference |
+| | | | io_listen | net.c | struct reference |
+| io_sr_msg | net.c | file, compat_msghdr, user_msghdr, void, int, unsigned, unsigned, unsigned, u16, u16, u16, void, io_kiocb | io_mshot_prep_retry | net.c | struct reference |
+| | | | io_compat_msg_copy_hdr | net.c | struct reference |
+| | | | io_msg_copy_hdr | net.c | struct reference |
+| | | | io_send_setup | net.c | struct reference |
+| | | | io_sendmsg_setup | net.c | struct reference |
+| | | | io_sendmsg_prep | net.c | struct reference |
+| | | | io_send_finish | net.c | struct reference |
+| | | | io_sendmsg | net.c | struct reference |
+| | | | io_send_select_buffer | net.c | struct reference |
+| | | | io_send | net.c | struct reference |
+| | | | io_recvmsg_prep_setup | net.c | struct reference |
+| | | | io_recvmsg_prep | net.c | struct reference |
+| | | | io_recv_finish | net.c | struct reference |
+| | | | io_recvmsg_prep_multishot | net.c | struct reference, function parameter |
+| | | | io_recvmsg_multishot | net.c | struct reference, function parameter |
+| | | | io_recvmsg | net.c | struct reference |
+| | | | io_recv_buf_select | net.c | struct reference |
+| | | | io_recv | net.c | struct reference |
+| | | | io_send_zc_cleanup | net.c | struct reference |
+| | | | io_send_zc_prep | net.c | struct reference |
+| | | | io_send_zc_import | net.c | struct reference |
+| | | | io_send_zc | net.c | struct reference |
+| | | | io_sendmsg_zc | net.c | struct reference |
+| | | | io_sendrecv_fail | net.c | struct reference |
+| io_recvzc | net.c | file, uint, u16, u32, io_zcrx_ifq | io_recvzc_prep | net.c | struct reference |
+| | | | io_recvzc | net.c | struct reference |
+| io_recvmsg_multishot_hdr | net.c | io_uring_recvmsg_out, sockaddr_storage | io_recvmsg_multishot | net.c | struct reference |
+| io_nop | nop.c | file, int, int, int, uint | io_nop_prep | nop.c | struct reference |
+| | | | io_nop | nop.c | struct reference |
+| io_open | openclose.c | file, int, u32, filename, open_how, unsigned | io_openat_force_async | openclose.c | function parameter |
+| | | | __io_openat_prep | openclose.c | struct reference |
 | | | | io_openat_prep | openclose.h | struct reference |
-| | | | io_openat | openclose.h | struct reference |
+| | | | io_openat2_prep | openclose.c | struct reference |
+| | | | io_openat2 | openclose.c | struct reference |
 | | | | io_open_cleanup | openclose.h | struct reference |
-| | | | io_openat2_prep | openclose.h | struct reference |
-| | | | io_openat2 | openclose.h | struct reference |
-| io_close | openclose.c | file, int, u32 | __io_close_fixed | openclose.c | return value |
-| | | | io_close_fixed | openclose.c | return value |
-| | | | io_close_prep | openclose.c | return value |
-| | | | io_close | openclose.c | return value |
-| | | | __io_close_fixed | rsrc.c | struct reference |
-| | | | __io_close_fixed | openclose.h | struct reference |
-| | | | io_close_prep | openclose.h | struct reference |
-| | | | io_close | openclose.h | struct reference |
-| io_fixed_install | openclose.c | file, uint | io_install_fixed_fd_prep | openclose.c | return value |
-| | | | io_install_fixed_fd | openclose.c | return value |
-| io_poll_update | poll.c | file, u64, u64, __poll_t, bool, bool | io_kiocb_to_cmd | poll.c | function parameter,return value |
+| io_close | openclose.c | file, int, u32 | io_close_fixed | openclose.c | struct reference |
+| | | | io_close_prep | openclose.c | struct reference |
+| | | | io_close | openclose.c | struct reference |
+| io_fixed_install | openclose.c | file, uint | io_install_fixed_fd_prep | openclose.c | struct reference |
+| | | | io_install_fixed_fd | openclose.c | struct reference |
+| io_poll_update | poll.c | file, u64, u64, __poll_t, bool, bool | io_poll_remove_prep | poll.c | struct reference |
+| | | | io_poll_remove | poll.c | struct reference |
 | io_poll_table | poll.c | poll_table_struct, io_kiocb, int, int, bool, __poll_t | __io_queue_proc   | poll.c |  function parameter |
 | | | | io_poll_queue_proc | poll.c | Local variable |
 | | | | io_poll_can_finish_inline | poll.c | function parameter |
