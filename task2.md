@@ -464,19 +464,19 @@
 | | include/linux/slab.h | kfree | 1 |
 | | arch/x86/boot/compressed/string.c | memset | 1 |
 | poll.h | include/linux/atomic/atomic-instrumented.h | atomic_inc | 1 |
-| cancel.h |  |  |  |
+| cancel.h | - | - | - |
 | alloc_cache.c | arch/x86/events/amd/uncore.c | free | 1 |
 | | io_uring/alloc_cache.h | io_alloc_cache_get | 1 |
 | | include/linux/slab.h | kmalloc | 1 |
 | | drivers/vdpa/mlx5/core/mr.c | kvfree | 1 |
 | | include/linux/slab.h | kvmalloc_array | 1 |
 | | arch/x86/boot/compressed/string.c | memset | 1 |
-| openclose.h |  |  |  |
-| xattr.h |  |  |  |
-| waitid.h |  |  |  |
-| truncate.h |  |  |  |
-| nop.h |  |  |  |
-| fdinfo.h |  |  |  |
+| openclose.h | - | - | - |
+| xattr.h | - | - | - |
+| waitid.h | - | - | - |
+| truncate.h | - | - | - |
+| nop.h | - | - | - |
+| fdinfo.h | - | - | - |
 | io_uring.c | arch/x86/kernel/cpu/cacheinfo.c | __acquires | 1 |
 | | include/linux/linkage.h | ALIGN | 1 |
 | | kernel/workqueue.c | alloc_workqueue | 1 |
@@ -1129,8 +1129,8 @@
 | | arch/x86/include/asm/pci_x86.h | slots | 1 |
 | | arch/x86/boot/bitops.h | test_bit | 2 |
 | | include/asm-generic/bug.h | WARN_ON_ONCE | 2 |
-| memmap.h | | | |
-| sync.h | | | |
+| memmap.h | - | - | - |
+| sync.h | - | - | - |
 | filetable.c | include/linux/bitmap.h | bitmap_free | 1 |
 | | lib/bitmap.c | bitmap_zalloc | 1 |
 | | include/linux/overflow.h | check_add_overflow | 1 |
