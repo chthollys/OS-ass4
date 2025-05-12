@@ -60,7 +60,7 @@ int io_madvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 }
 
 /* executes a madvise request
- * calls do_madvise() to perform the operation and sets the result in the request.
+ * calls do_madvise to perform the operation and sets the result in the request.
  * ensures the operation is executed synchronously.
  */
 int io_madvise(struct io_kiocb *req, unsigned int issue_flags)
@@ -117,7 +117,7 @@ int io_fadvise_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 }
 
 /* executes an fadvise request
- * calls vfs_fadvise() to perform the operation and sets the result in the request.
+ * calls vfs_fadvise to perform the operation and sets the result in the request.
  * handles both synchronous and asynchronous execution based on the advice parameter.
  */
 int io_fadvise(struct io_kiocb *req, unsigned int issue_flags)
