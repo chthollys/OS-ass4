@@ -609,3 +609,52 @@
 | | | | io_waitid_free | waitid.c | return value |
 | | | | io_kiocb_to_cmd | waitid.c | return value |
 | | | | io_waitid_cb | waitid.c | return value |
+| io_async_cmd | uring_cmd.h | io_uring_cmd_data	data, iou_vec, io_uring_sqe | io_cmd_cache_free | uring_cmd.c | return value |
+| | | | io_req_uring_cleanup | uring_cmd.c | return value |
+| | | | io_uring_cmd_prep_setup | uring_cmd.c | return value |
+| | | | io_uring_cmd_import_fixed_vec | uring_cmd.c | return value |
+| | | | io_ring_ctx_alloc | io_uring.c | return value |
+| io_zcrx_area | zcrx.h | net_iov_area nia, io_zcrx_ifq	*ifq, atomic_t *user_refs, bool	is_mapped, u16 area_id, page* *pages, spinlock_t, freelist_lock ____cacheline_aligned_in_smp, u32 free_count, u32 *freelist | io_zcrx_create_area | zcrx.c | return value |
+| | | | __io_zcrx_unmap_area | zcrx.c | function parameter |
+| | | | io_zcrx_unmap_area | zcrx.c | function parameter |
+| | | | io_zcrx_map_area | zcrx.c | return value, function parameter |
+| | | | io_get_user_counter | zcrx.c | return value |
+| | | | io_zcrx_iov_page | zcrx.c | return value |
+| | | | io_zcrx_free_area | zcrx.c | function parameter |
+| | | | io_zcrx_create_area | zcrx.c | function parameter, return value |
+| | | | __io_zcrx_get_free_niov | zcrx.c | return value, function parameter |
+| | | | io_zcrx_return_niov_freelist | zcrx.c | function parameter |
+| | | | io_zcrx_scrub | zcrx.c | return value |
+| | | | io_zcrx_refill_slow | zcrx.c | return value |
+| | | | io_pp_zc_destroy | zcrx.c | return value |
+| | | | io_zcrx_queue_cqe | zcrx.c | return value |
+| | | | io_zcrx_alloc_fallback | zcrx.c | return value, function parameter |
+| | | | io_zcrx_copy_chunk | zcrx.c | return value, function parameter |
+| io_zcrx_ifq | zcrx.h | io_ring_ctx, io_zcrx_area, io_uring, io_uring_zcrx_rqe, u32, u32, spinlock_t, u32, device, net_device, netdevice_tracker,  spinlock_t | __io_zcrx_unmap_area | zcrx.c | function parameter |
+| | | | io_zcrx_unmap_area | zcrx.c | function parameter |
+| | | | io_zcrx_map_area | zcrx.c | function parameter |
+| | | | io_allocate_rbuf_ring | zcrx.c | function parameter, return value |
+| | | | io_free_rbuf_ring | zcrx.c | function parameter |
+| | | | io_zcrx_create_area | zcrx.c | function parameter, return value |
+| | | | io_zcrx_ifq_alloc | zcrx.c | function parameter, return value |
+| | | | io_zcrx_drop_netdev | zcrx.c | function parameter |
+| | | | io_close_queue | zcrx.c | function parameter |
+| | | | io_zcrx_ifq_free | zcrx.c | function parameter |
+| | | | io_register_zcrx_ifq | zcrx.c | function parameter |
+| | | | io_unregister_zcrx_ifqs | zcrx.c | function parameter |
+| | | | io_zcrx_scrub | zcrx.c | function parameter |
+| | | | io_zcrx_rqring_entries | zcrx.c | function parameter, return value |
+| | | | io_zcrx_get_rqe | zcrx.c | function parameter, return value |
+| | | | io_zcrx_ring_refill | zcrx.c | function parameter |
+| | | | io_zcrx_refill_slow | zcrx.c | function parameter |
+| | | | io_pp_zc_alloc_netmems | zcrx.c | function parameter, return value |
+| | | | io_pp_zc_init | zcrx.c | return value |
+| | | | io_pp_zc_destroy | zcrx.c | return value |
+| | | | io_pp_uninstall | zcrx.c | return value |
+| | | | io_zcrx_queue_cqe | zcrx.c | function parameter, return value |
+| | | | io_zcrx_copy_chunk | zcrx.c | function parameter, return value |
+| | | | io_zcrx_copy_frag | zcrx.c | function parameter, return value |
+| | | | io_zcrx_recv_frag | zcrx.c | function parameter, return value |
+| | | | io_zcrx_recv_skb | zcrx.c | return value |
+| | | | io_zcrx_tcp_recvmsg | zcrx.c | function parameter, return value |
+| | | | io_zcrx_recv | zcrx.c | function parameter, return value |
